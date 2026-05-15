@@ -213,6 +213,7 @@
     <Compile Include="Areas\Admin\Controllers\PromotionController.cs" />
     <Compile Include="Areas\Admin\Controllers\RoleController.cs" />
     <Compile Include="Areas\Admin\Controllers\SettingSystemController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ShipmentController.cs" />
     <Compile Include="Areas\Admin\Controllers\StatisticalController.cs" />
     <Compile Include="Common\Common.cs" />
     <Compile Include="Controllers\AboutController.cs" />
@@ -248,10 +249,15 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\CommonAbstract.cs" />
     <Compile Include="Models\Common\Filter.cs" />
     <Compile Include="Models\Common\ThongKeTruyCap.cs" />
     <Compile Include="Models\CustomerReportItem.cs" />
+    <Compile Include="Models\EF\OrderStatus.cs" />
+    <Compile Include="Models\EF\Shipment.cs" />
+    <Compile Include="Models\EF\ShipmentHistory.cs" />
+    <Compile Include="Models\EF\ShippingProvider.cs" />
     <Compile Include="Models\ProductReportItem.cs" />
     <Compile Include="Models\CustomerViewModel.cs" />
     <Compile Include="Models\EF\Adv.cs" />
@@ -4151,6 +4157,7 @@
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Views\Base\" />
     <Folder Include="Areas\Admin\Views\ChatBot\" />
+    <Folder Include="Areas\Admin\Views\Shipment\" />
     <Folder Include="Content\ckfinder\userfiles\" />
     <Folder Include="Resource\" />
     <Folder Include="Uploads\files\" />

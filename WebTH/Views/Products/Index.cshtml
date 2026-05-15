@@ -893,9 +893,9 @@
             // ❌ Hiện tại trong jsShopping.js đọc #quantity_value không tồn tại
             // ✅ Override lại trong trang Index — thêm vào @section scripts*@
 
-            $('body').on('click', '.btnAddToCart', function (e) {
-                e.preventDefault();
-                var id = $(this).data('id');
+            //$('body').on('click', '.btnAddToCart', function (e) {
+            //    e.preventDefault();
+            //    var id = $(this).data('id');
 
                 //// ✅ Đọc quantity an toàn: thử #quantity_value trước, fallback = 1
                 //var quantity = 1;
@@ -922,11 +922,11 @@
                 //            showCustomAlert(rs.msg, false);
                 //        }
                 //    },
-                    error: function () {
-                        showCustomAlert('Có lỗi xảy ra, vui lòng thử lại!', false);
-                    }
-                });
-            });
+            //        error: function () {
+            //            showCustomAlert('Có lỗi xảy ra, vui lòng thử lại!', false);
+            //        }
+            //    });
+            //});
 
             // Filter and Sort Functions
             function filterAndSortProducts() {
