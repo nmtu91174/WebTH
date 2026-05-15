@@ -214,6 +214,7 @@
     <Compile Include="Areas\Admin\Controllers\RoleController.cs" />
     <Compile Include="Areas\Admin\Controllers\SettingSystemController.cs" />
     <Compile Include="Areas\Admin\Controllers\ShipmentController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ShipperController.cs" />
     <Compile Include="Areas\Admin\Controllers\StatisticalController.cs" />
     <Compile Include="Common\Common.cs" />
     <Compile Include="Controllers\AboutController.cs" />
@@ -235,9 +236,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202605150420500_InitialSync.cs" />
-    <Compile Include="Migrations\202605150420500_InitialSync.Designer.cs">
-      <DependentUpon>202605150420500_InitialSync.cs</DependentUpon>
+    <Compile Include="Migrations\202605150742477_InitialSync.cs" />
+    <Compile Include="Migrations\202605150742477_InitialSync.Designer.cs">
+      <DependentUpon>202605150742477_InitialSync.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -245,10 +246,14 @@
     <Compile Include="Models\Common\Filter.cs" />
     <Compile Include="Models\Common\ThongKeTruyCap.cs" />
     <Compile Include="Models\CustomerReportItem.cs" />
+    <Compile Include="Models\EF\DeliveryIssue.cs" />
+    <Compile Include="Models\EF\OrderHistory.cs" />
+    <Compile Include="Models\EF\OrderImage.cs" />
     <Compile Include="Models\EF\OrderStatus.cs" />
     <Compile Include="Models\EF\Shipment.cs" />
     <Compile Include="Models\EF\ShipmentHistory.cs" />
     <Compile Include="Models\EF\ShippingProvider.cs" />
+    <Compile Include="Models\EF\tb_OrderImageAttribute.cs" />
     <Compile Include="Models\ProductReportItem.cs" />
     <Compile Include="Models\CustomerViewModel.cs" />
     <Compile Include="Models\EF\Adv.cs" />
@@ -4001,6 +4006,7 @@
     <Content Include="Areas\Admin\Views\AdminVet\EditRating.cshtml" />
     <Content Include="Areas\Admin\Views\Shipment\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Shipment\Detail.cshtml" />
+    <Content Include="Areas\Admin\Views\Shipper\Index.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\chat-widget.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -4154,6 +4160,7 @@
     <Folder Include="Resource\" />
     <Folder Include="Uploads\files\" />
     <Folder Include="Uploads\flash\" />
+    <Folder Include="Uploads\ShipperProofs\" />
     <Folder Include="Views\News\" />
   </ItemGroup>
   <ItemGroup>
@@ -4170,8 +4177,8 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202605150420500_InitialSync.resx">
-      <DependentUpon>202605150420500_InitialSync.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202605150742477_InitialSync.resx">
+      <DependentUpon>202605150742477_InitialSync.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

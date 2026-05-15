@@ -112,6 +112,18 @@
                 <div class="col-12">
                     @Html.Action("Partial_SanPham", "Order", new { id = Model.Id })
                 </div>
+                @if (Model.Status == 2 && ViewBag.ShipperList != null)
+                {
+                    <div class="card card-warning mt-3">
+                        <div class="card-header"><h3 class="card-title">Phân công Shipper</h3></div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                @Html.DropDownList("ddlShipper", (SelectList)ViewBag.ShipperList, "--- Chọn Shipper ---", new { @class = "form-control", @id = "ddlShipper" })
+                            </div>
+                            <button class="btn btn-primary" onclick="assignShipper(@Model.Id)">Giao đơn này</button>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
         <!-- /.card-body -->
@@ -124,3 +136,21 @@
 
 </section>
 <!-- /.content -->
+@section scripts{
+    <script>
+        function assignShipper(orderId) {
+            var shipperId = $('#ddlShipper').val();
+            if (!shipperId) {
+                alert('Vui lòng chọn 1 Shipper!'); return;
+            }
+            $.post('/Admin/Order/AssignShipper', { id: orderId, shipperId: shipperId }, function (res) {
+                if (res.success) {
+                    alert(res.msg);
+                    location.reload();
+                } else {
+                    alert(res.msg);
+                }
+            });
+        }
+    </script>
+}

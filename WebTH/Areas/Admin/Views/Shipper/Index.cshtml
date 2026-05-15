@@ -1,0 +1,179 @@
+﻿@model IEnumerable<WebTH.Models.EF.Order>
+@{
+    ViewBag.Title = "Bảng điều khiển Shipper";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml"; // Dùng chung layout Admin
+}
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-12 col-md-6 mb-3">
+            <div class="card @(item.IsLocked ? (item.Status == 5 ? "card-success" : "card-danger") : "card-primary")">
+                <div class="card-header">
+                    <h3 class="card-title">Mã đơn: @item.Code</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Khách hàng:</strong> @item.CustomerName</p>
+                    <p><strong>SĐT:</strong> <a href="tel:@item.Phone" class="btn btn-sm btn-success"><i class="fa fa-phone"></i> @item.Phone</a></p>
+                    <p><strong>Địa chỉ:</strong> @item.Address</p>
+                    <p><strong>Tổng thu (COD):</strong> <span class="text-danger font-weight-bold" style="font-size:18px">@WebTH.Common.Common.FormatNumber(item.TotalAmount, 0) đ</span></p>
+
+                    <hr />
+
+                    @if (!item.IsLocked)
+                    {
+                        <form class="frmShipperAction" enctype="multipart/form-data">
+                            <input type="hidden" name="orderId" value="@item.Id" />
+
+                            @if (item.Status == 2) // Trạng thái Admin vừa gán
+                            {
+                                <input type="hidden" name="nextStatus" value="3" />
+                                <button type="button" class="btn btn-primary btn-block btn-lg btnSubmit">NHẬN ĐƠN NÀY</button>
+                            }
+                            else if (item.Status == 3) // Trạng thái Đã Nhận
+                            {
+                                <input type="hidden" name="nextStatus" value="4" />
+                                <div class="form-group text-center">
+                                    <label>Chụp ảnh gói hàng tại kho</label>
+                                    <input type="file" name="proofImage" class="form-control-file" accept="image/*" capture="environment" />
+                                </div>
+                                <button type="button" class="btn btn-warning btn-block btn-lg btnSubmit">ĐÃ LẤY HÀNG</button>
+                            }
+                            else if (item.Status == 4) // Trạng thái Đang đi giao
+                            {
+                                <div class="form-group text-center">
+                                    <label>Chụp ảnh tại nơi giao (Nhà khách)</label>
+                                    <input type="file" name="proofImage" id="proof_@item.Id" class="form-control-file" accept="image/*" capture="environment" />
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-success btn-block btnSubmitSuccess" data-id="@item.Id">THÀNH CÔNG</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#failModal_@item.Id">THẤT BẠI</button>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="failModal_@item.Id" tabindex="-1" role="dialog">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger">
+                                                <h5 class="modal-title">Báo Cáo Giao Thất Bại</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label>Lý do thất bại</label>
+                                                    <select name="failedReason" class="form-control">
+                                                        <option value="Khách không nghe máy">Khách không nghe máy</option>
+                                                        <option value="Khách từ chối nhận hàng">Khách từ chối nhận hàng</option>
+                                                        <option value="Sai địa chỉ / Không tìm thấy">Sai địa chỉ / Không tìm thấy</option>
+                                                        <option value="Hàng hỏng lúc vận chuyển">Hàng hỏng lúc vận chuyển</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Ghi chú chi tiết</label>
+                                                    <textarea name="note" class="form-control" rows="2" placeholder="Ví dụ: Gọi 3 cuộc không bắt máy..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                <button type="button" class="btn btn-danger btnSubmitFail" data-id="@item.Id">Xác nhận Thất Bại</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </form>
+                    }
+                    else // IsLocked = true
+                    {
+                        <div class="alert @(item.Status == 5 ? "alert-success" : "alert-danger") text-center">
+                            <h4 class="mb-0">
+                                <i class="fa @(item.Status == 5 ? "fa-check-circle" : "fa-times-circle")"></i>
+                                @(item.Status == 5 ? "GIAO THÀNH CÔNG" : "GIAO THẤT BẠI")
+                            </h4>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Hàm gửi AJAX chứa File ảnh
+            function processWorkflow(formData) {
+                $.ajax({
+                    url: '/Admin/Shipper/UpdateWorkflow',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.success) {
+                            alert(res.msg); // Bạn có thể thay bằng toastr.success
+                            location.reload(); // Tải lại trang để đổi UI
+                        } else {
+                            alert(res.msg);
+                        }
+                    },
+                    error: function() {
+                        alert("Lỗi hệ thống, vui lòng thử lại!");
+                    }
+                });
+            }
+
+            // Xử lý nút Nhận đơn & Lấy hàng
+            $('.btnSubmit').click(function () {
+                var form = $(this).closest('form')[0];
+                var formData = new FormData(form);
+
+                // Validate nếu bắt buộc upload ảnh
+                if(formData.get("nextStatus") == "4" && formData.get("proofImage").size == 0) {
+                    alert("Vui lòng chụp ảnh gói hàng tại kho!");
+                    return;
+                }
+
+                $(this).prop('disabled', true).text('Đang xử lý...');
+                processWorkflow(formData);
+            });
+
+            // Xử lý nút Giao Thành Công
+            $('.btnSubmitSuccess').click(function () {
+                var form = $(this).closest('form')[0];
+                var formData = new FormData(form);
+
+                if(formData.get("proofImage").size == 0) {
+                    alert("Vui lòng chụp ảnh bưu gửi tại nơi giao!");
+                    return;
+                }
+
+                formData.set("nextStatus", "5");
+                $(this).prop('disabled', true);
+                processWorkflow(formData);
+            });
+
+            // Xử lý nút Xác nhận Giao Thất Bại (Trong Modal)
+            $('.btnSubmitFail').click(function () {
+                var form = $(this).closest('.modal').parent('form')[0];
+                var formData = new FormData(form);
+
+                if(formData.get("proofImage").size == 0) {
+                    alert("Vui lòng chụp ảnh bằng chứng (nhà khóa cửa, cuộc gọi...)!");
+                    return;
+                }
+
+                formData.set("nextStatus", "6");
+                // Cập nhật lại giá trị từ Modal vào FormData vì Modal nằm trong Form
+                formData.set("failedReason", $(form).find('select[name="failedReason"]').val());
+                formData.set("note", $(form).find('textarea[name="note"]').val());
+
+                $(this).prop('disabled', true);
+                processWorkflow(formData);
+            });
+        });
+    </script>
+}

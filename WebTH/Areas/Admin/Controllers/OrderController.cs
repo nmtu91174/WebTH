@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using PagedList;
+using Rotativa;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using WebTH.Models;
-using PagedList;
-using Rotativa;
+using WebTH.Models.EF;
 
 namespace WebTH.Areas.Admin.Controllers
 {
@@ -36,6 +38,20 @@ namespace WebTH.Areas.Admin.Controllers
         public ActionResult View(int id)
         {
             var item = db.Orders.Find(id);
+            if (item == null) return HttpNotFound();
+
+            // LẤY DANH SÁCH SHIPPER TRUYỀN RA VIEW
+            var roleManager = new Microsoft.AspNet.Identity.RoleManager<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>(new Microsoft.AspNet.Identity.EntityFramework.RoleStore<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>(db));
+            var userManager = new Microsoft.AspNet.Identity.UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(db));
+
+            // Tìm Role Shipper
+            var shipperRole = roleManager.FindByName("Shipper");
+            if (shipperRole != null)
+            {
+                var shippers = userManager.Users.Where(x => x.Roles.Any(r => r.RoleId == shipperRole.Id)).ToList();
+                ViewBag.ShipperList = new SelectList(shippers, "Id", "FullName"); // Hiển thị tên Shipper
+            }
+
             return View(item);
         }
 
@@ -94,5 +110,33 @@ namespace WebTH.Areas.Admin.Controllers
                 PageOrientation = Rotativa.Options.Orientation.Portrait
             };
         }
+        [HttpPost]
+        [Authorize(Roles = "Admin,Employee")]
+        public ActionResult AssignShipper(int id, string shipperId)
+        {
+            var order = db.Orders.Find(id);
+            if (order != null && order.Status == 2) // Chỉ gán khi Status = 2 (Đã duyệt)
+            {
+                order.ShipperId = shipperId;
+
+                // Lưu lịch sử
+                db.OrderHistories.Add(new OrderHistory
+                {
+                    OrderId = order.Id,
+                    StatusId = 2, // Vẫn giữ status 2, chỉ là Assigned
+                    Role = "system",
+                    Note = "Admin đã phân công cho Shipper: " + shipperId,
+                    CreatedBy = User.Identity.GetUserId(),
+                    CreatedDate = DateTime.Now
+                });
+
+                db.SaveChanges();
+                return Json(new { success = true, msg = "Phân công Shipper thành công!" });
+            }
+            return Json(new { success = false, msg = "Đơn hàng phải ở trạng thái ĐÃ DUYỆT mới được phân công!" });
+        }
+
     }
+
+
 }

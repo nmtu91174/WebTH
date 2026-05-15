@@ -13,7 +13,7 @@ namespace WebTH.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202605150420500_InitialSync"; }
+            get { return "202605150742477_InitialSync"; }
         }
         
         string IMigrationMetadata.Source

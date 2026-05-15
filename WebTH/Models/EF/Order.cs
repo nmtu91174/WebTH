@@ -48,5 +48,18 @@ namespace WebTH.Models.EF
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
         public virtual ICollection<Shipment> Shipments { get; set; }
+
+        // Thêm vào class Order hiện tại của bạn
+        public string ShipperId { get; set; }
+        public string AgentId { get; set; }
+        public bool IsLocked { get; set; }
+        public int? PreviousStatus { get; set; }
+        public string PickupProof { get; set; }
+        public string DeliveryProof { get; set; }
+        public string FailedReason { get; set; }
+        public DateTime? DeliveredAt { get; set; }
+        public DateTime? FailedAt { get; set; }
+
+        public virtual ICollection<OrderHistory> OrderHistories { get; set; }
     }
 }
