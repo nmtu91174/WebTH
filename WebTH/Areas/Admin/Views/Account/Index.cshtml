@@ -39,10 +39,8 @@
                         <th>Tài khoản</th>
                         <th>Họ tên</th>
                         <th>Email</th>
-                        <th>Ngày tạo</th>
-
-
-                        <th></th>
+                        <th>Role</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,7 +54,7 @@
                                 <td>@item.UserName</td>
                                 <td>@item.Fullname</td>
                                 <td>@item.Email</td>
-
+                                <td>@item.Roles</td>
                                 <td>
                                     <a href="@Url.Action("Edit", "Account", new { Area = "Admin", id = item.Id })" class="btn btn-sm btn-primary">Sửa</a>
                                     <a href="#" data-user="@item.UserName" data-id="@item.Id" class="btn btn-sm btn-danger btnDelete">Xóa</a>

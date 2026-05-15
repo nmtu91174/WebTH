@@ -24,9 +24,11 @@ namespace WebTH.Areas.Admin.Controllers
         }
 
         // Tạo vận đơn cho đơn hàng
-        public ActionResult Create(int orderId)
+        public ActionResult Create(int id)
         {
-            var order = db.Orders.Find(orderId);
+            //int orderId = id;
+
+            var order = db.Orders.Find(id);
             if (order == null) return HttpNotFound();
 
             ViewBag.Order = order;

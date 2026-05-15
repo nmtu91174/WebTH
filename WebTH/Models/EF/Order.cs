@@ -13,6 +13,7 @@ namespace WebTH.Models.EF
         public Order()
         {
             this.OrderDetails = new HashSet<OrderDetail>();
+            this.Shipments = new HashSet<Shipment>(); // Thêm dòng này
         }
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
@@ -45,5 +46,7 @@ namespace WebTH.Models.EF
 
 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+
+        public virtual ICollection<Shipment> Shipments { get; set; }
     }
 }
