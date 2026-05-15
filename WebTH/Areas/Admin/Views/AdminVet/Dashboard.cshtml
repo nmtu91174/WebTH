@@ -1,0 +1,393 @@
+﻿@{
+    ViewBag.Title = "Tổng quan Thú Y";
+
+    var topClinics = ViewBag.TopClinics as List<WebTH.Models.VetClinic> ?? new List<WebTH.Models.VetClinic>();
+    var recentRecommendations = ViewBag.RecentRecommendations as List<WebTH.Models.VetRecommendation> ?? new List<WebTH.Models.VetRecommendation>();
+
+    int totalClinics = ViewBag.TotalClinics != null ? (int)ViewBag.TotalClinics : 0;
+    int verifiedClinics = ViewBag.VerifiedClinics != null ? (int)ViewBag.VerifiedClinics : 0;
+    int pendingRecommendations = ViewBag.PendingRecommendations != null ? (int)ViewBag.PendingRecommendations : 0;
+    int pendingRatings = ViewBag.PendingRatings != null ? (int)ViewBag.PendingRatings : 0;
+    int totalDoctors = ViewBag.TotalDoctors != null ? (int)ViewBag.TotalDoctors : 0;
+    int totalRecommendations = ViewBag.TotalRecommendations != null ? (int)ViewBag.TotalRecommendations : 0;
+    int approvedRatings = ViewBag.ApprovedRatings != null ? (int)ViewBag.ApprovedRatings : 0;
+
+    int unverifiedClinics = totalClinics - verifiedClinics;
+    if (unverifiedClinics < 0) { unverifiedClinics = 0; }
+
+    int verifyPercent = totalClinics > 0 ? (int)Math.Round((double)verifiedClinics * 100 / totalClinics) : 0;
+    int unverifyPercent = 100 - verifyPercent;
+    if (unverifyPercent < 0) { unverifyPercent = 0; }
+
+    int quickClinicId = 1;
+    if (topClinics.Any())
+    {
+        quickClinicId = topClinics.First().Id;
+    }
+    else if (recentRecommendations.Any())
+    {
+        quickClinicId = recentRecommendations.First().ClinicId;
+    }
+}
+
+@section naviheader {
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="@Url.Action("Dashboard", "AdminVet", new { Area = "Admin" })" class="nav-link">Thú Y Dashboard</a>
+        </li>
+    </ul>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="mb-1">Dashboard Thú Y</h1>
+                <div class="text-muted">Tổng quan phòng khám, bác sĩ, khuyến cáo và đánh giá.</div>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/home">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Thú Y Dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content vet-dashboard">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>@totalClinics</h3>
+                        <p>Tổng phòng khám</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-clinic-medical"></i></div>
+                    <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="small-box-footer">
+                        Xem danh sách <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@verifiedClinics</h3>
+                        <p>Phòng khám đã xác minh</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="small-box-footer small-box-note">@verifyPercent% tổng hệ thống</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@pendingRecommendations</h3>
+                        <p>Khuyến cáo chờ duyệt</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-clipboard-check"></i></div>
+                    <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = quickClinicId })" class="small-box-footer">
+                        Duyệt ngay <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@pendingRatings</h3>
+                        <p>Đánh giá chờ duyệt</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-star-half-alt"></i></div>
+                    <a href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = quickClinicId })" class="small-box-footer">
+                        Xử lý ngay <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card card-outline card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Hiệu Suất Hệ Thống</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                                <div class="metric-card border-info">
+                                    <div class="metric-label">Tổng bác sĩ</div>
+                                    <div class="metric-value text-info">@totalDoctors</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                                <div class="metric-card border-success">
+                                    <div class="metric-label">Khuyến cáo đã duyệt</div>
+                                    <div class="metric-value text-success">@totalRecommendations</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-12">
+                                <div class="metric-card border-primary">
+                                    <div class="metric-label">Đánh giá đã duyệt</div>
+                                    <div class="metric-value text-primary">@approvedRatings</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row align-items-center">
+                            <div class="col-md-8 mb-3 mb-md-0">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Tỷ lệ xác minh phòng khám</span>
+                                    <strong>@verifyPercent%</strong>
+                                </div>
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-success" style="width:@verifyPercent%"></div>
+                                    <div class="progress-bar bg-secondary" style="width:@unverifyPercent%"></div>
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    @verifiedClinics đã xác minh | @unverifiedClinics chưa xác minh
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-right">
+                                <a href="@Url.Action("CreateClinic", "AdminVet", new { Area = "Admin" })" class="btn btn-primary btn-sm mr-1">
+                                    <i class="fas fa-plus mr-1"></i> Thêm phòng khám
+                                </a>
+                                <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="btn btn-outline-primary btn-sm">
+                                    Quản lý
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card card-outline card-info">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-bolt mr-2"></i>Hành Động Nhanh</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush quick-list">
+                            <a href="@Url.Action("CreateClinic", "AdminVet", new { Area = "Admin" })" class="list-group-item list-group-item-action">
+                                <i class="fas fa-plus-circle text-primary mr-2"></i> Thêm phòng khám mới
+                            </a>
+                            <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="list-group-item list-group-item-action">
+                                <i class="fas fa-hospital text-info mr-2"></i> Quản lý phòng khám
+                            </a>
+                            <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = quickClinicId })" class="list-group-item list-group-item-action">
+                                <i class="fas fa-check-circle text-warning mr-2"></i> Duyệt khuyến cáo
+                            </a>
+                            <a href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = quickClinicId })" class="list-group-item list-group-item-action">
+                                <i class="fas fa-star text-success mr-2"></i> Duyệt đánh giá
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="card card-outline card-warning">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title"><i class="fas fa-award mr-2"></i>Top 5 Phòng Khám</h3>
+                        <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="btn btn-xs btn-default">Xem tất cả</a>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (topClinics.Any())
+                        {
+                            <ul class="list-group list-group-flush top-clinics">
+                                @{
+                                    int rank = 1;
+                                }
+                                @foreach (var clinic in topClinics)
+                                {
+                                    <li class="list-group-item d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <span class="rank-badge">#@rank</span>
+                                            <div>
+                                                <a href="@Url.Action("EditClinic", "AdminVet", new { Area = "Admin", id = clinic.Id })" class="clinic-name">
+                                                    @clinic.ClinicName
+                                                </a>
+                                                <div class="small text-muted">@clinic.TotalRecommendations khuyến cáo</div>
+                                            </div>
+                                        </div>
+                                        <span class="badge badge-warning"><i class="fas fa-star mr-1"></i>@clinic.AverageRating.ToString("F1")</span>
+                                    </li>
+                                    rank++;
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="empty-box">Chưa có dữ liệu top phòng khám.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card card-outline card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history mr-2"></i>Khuyến Cáo Gần Đây</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (recentRecommendations.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Phòng khám</th>
+                                            <th>Sản phẩm</th>
+                                            <th>Loại thú</th>
+                                            <th>Lý do</th>
+                                            <th class="text-center">Trạng thái</th>
+                                            <th>Ngày tạo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var rec in recentRecommendations)
+                                        {
+                                            var reason = string.IsNullOrWhiteSpace(rec.ReccommendationReason) ? "-" : rec.ReccommendationReason;
+                                            var reasonShort = reason.Length > 32 ? reason.Substring(0, 32) + "..." : reason;
+                                            <tr>
+                                                <td>@(rec.VetClinic != null ? rec.VetClinic.ClinicName : "-")</td>
+                                                <td>@(rec.Product != null ? rec.Product.Title : "-")</td>
+                                                <td><span class="badge badge-info">@rec.PetType</span></td>
+                                                <td title="@reason">@reasonShort</td>
+                                                <td class="text-center">
+                                                    @if (rec.IsApproved)
+                                                    {
+                                                        <span class="badge badge-success">Đã duyệt</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-warning">Chờ duyệt</span>
+                                                    }
+                                                </td>
+                                                <td>@rec.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-box">Chưa có khuyến cáo nào.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .vet-dashboard .small-box {
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 24px rgba(16, 24, 40, 0.12);
+        overflow: hidden;
+    }
+
+    .vet-dashboard .small-box .inner h3 {
+        font-size: 2rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .vet-dashboard .small-box .inner p {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    .vet-dashboard .small-box .icon {
+        opacity: 0.3;
+    }
+
+    .vet-dashboard .small-box-note {
+        display: block;
+        padding: 0.5rem 0.75rem;
+        color: #fff;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.18);
+    }
+
+    .vet-dashboard .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 6px 18px rgba(16, 24, 40, 0.08);
+    }
+
+    .vet-dashboard .metric-card {
+        border-left: 4px solid;
+        border-radius: 0.5rem;
+        background: #f8f9fb;
+        padding: 0.9rem 0.85rem;
+    }
+
+    .vet-dashboard .metric-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+
+    .vet-dashboard .metric-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .vet-dashboard .quick-list .list-group-item {
+        border-left: 0;
+        border-right: 0;
+        padding: 0.85rem 1rem;
+        font-weight: 500;
+    }
+
+    .vet-dashboard .top-clinics .list-group-item {
+        border-left: 0;
+        border-right: 0;
+        padding: 0.8rem 1rem;
+    }
+
+    .vet-dashboard .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 28px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #3b5bdb;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-right: 0.65rem;
+    }
+
+    .vet-dashboard .clinic-name {
+        color: #212529;
+        font-weight: 600;
+    }
+
+    .vet-dashboard .clinic-name:hover {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .vet-dashboard .empty-box {
+        padding: 1.25rem;
+        text-align: center;
+        color: #6c757d;
+    }
+</style>

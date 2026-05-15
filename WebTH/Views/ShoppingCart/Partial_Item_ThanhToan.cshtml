@@ -1,0 +1,50 @@
+﻿@model IEnumerable<WebTH.Models.ShoppingCartItem>
+@using WebTH.Common
+
+@if (Model != null && Model.Any())
+{
+    var totalAmount = Model.Sum(x => x.TotalPrice);
+    var totalQuantity = Model.Sum(x => x.Quantity);
+
+    <div class="checkout-summary-head">
+        <h3>Đơn hàng</h3>
+        <span>@Model.Count() sản phẩm</span>
+    </div>
+
+    <div class="checkout-summary-items">
+        @foreach (var item in Model)
+        {
+            <div class="summary-line">
+                <div class="summary-product">
+                    <strong>@item.ProductName</strong>
+                    <span>SL: @item.Quantity x @Common.FormatNumber(item.Price, 0)đ</span>
+                </div>
+                <div class="summary-price">@Common.FormatNumber(item.TotalPrice, 0)đ</div>
+            </div>
+        }
+    </div>
+
+    <div class="summary-metric">
+        <span>Tổng số lượng</span>
+        <strong>@totalQuantity</strong>
+    </div>
+    <div class="summary-metric">
+        <span>Tạm tính</span>
+        <strong>@Common.FormatNumber(totalAmount, 0)đ</strong>
+    </div>
+    <div class="summary-metric summary-grand">
+        <span>Tổng thanh toán</span>
+        <strong>@Common.FormatNumber(totalAmount, 0)đ</strong>
+    </div>
+
+    <a href="/gio-hang" class="btn btn-default btn-block checkout-edit-cart">
+        <i class="fa fa-shopping-cart"></i> Quay lại giỏ hàng
+    </a>
+    <p class="summary-note"><i class="fa fa-info-circle"></i> Đơn hàng sẽ được xác nhận qua email hoặc số điện thoại của bạn.</p>
+}
+else
+{
+    <div class="checkout-empty">
+        Giỏ hàng của bạn đang trống. Vui lòng thêm sản phẩm trước khi thanh toán.
+    </div>
+}

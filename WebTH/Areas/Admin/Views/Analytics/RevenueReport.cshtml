@@ -1,0 +1,617 @@
+﻿@model WebTH.Models.AnalyticsOverviewViewModel
+
+@{
+    ViewBag.Title = "Báo cáo doanh thu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .revenue-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .revenue-value {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .revenue-label {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin-bottom: 40px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .metric-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .metric-card {
+        flex: 1;
+        min-width: 200px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid #667eea;
+    }
+
+    .metric-card h5 {
+        margin: 0 0 10px 0;
+        color: #666;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .metric-change {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .metric-change.positive {
+        color: #28a745;
+    }
+
+    .metric-change.negative {
+        color: #dc3545;
+    }
+
+    .table-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+
+    .header-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .btn-group-custom {
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        text-align: center;
+        border-top: 4px solid #667eea;
+    }
+
+    .stat-box h6 {
+        color: #888;
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .stat-box .amount {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .stat-box .icon {
+        font-size: 32px;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="header-title">
+        <i class="fas fa-chart-line"></i> Báo Cáo Doanh Thu
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="icon"><i class="fas fa-coins"></i></div>
+            <h6>Tổng Doanh Thu</h6>
+            <div class="amount">@string.Format("{0:N0}", Model.TotalRevenue) đ</div>
+        </div>
+
+        <div class="stat-box" style="border-top-color: #17a2b8;">
+            <div class="icon" style="color: #17a2b8;"><i class="fas fa-shopping-cart"></i></div>
+            <h6>Tổng Đơn Hàng</h6>
+            <div class="amount">@Model.TotalOrders</div>
+        </div>
+
+        <div class="stat-box" style="border-top-color: #28a745;">
+            <div class="icon" style="color: #28a745;"><i class="fas fa-coins"></i></div>
+            <h6>Giá Trị Đơn Trung Bình</h6>
+            <div class="amount">@string.Format("{0:N0}", Model.AverageOrderValue) đ</div>
+        </div>
+
+        <div class="stat-box" style="border-top-color: #ffc107;">
+            <div class="icon" style="color: #ffc107;"><i class="fas fa-users"></i></div>
+            <h6>Tổng Khách Hàng</h6>
+            <div class="amount">@Model.TotalCustomers</div>
+        </div>
+    </div>
+
+    <!-- This Month vs Last Month -->
+    <div class="metric-row">
+        <div class="metric-card">
+            <h5><i class="fas fa-calendar-alt"></i> Doanh Thu Tháng Này</h5>
+            <div class="metric-value">@string.Format("{0:N0}", Model.RevenueThisMonth) đ</div>
+            <div class="metric-change @(Model.RevenueGrowth >= 0 ? "positive" : "negative")">
+                @if (Model.RevenueGrowth >= 0)
+                {
+                    <span><i class="fas fa-arrow-up"></i> +@Model.RevenueGrowth.ToString("F1")%</span>
+                }
+                else
+                {
+                    <span><i class="fas fa-arrow-down"></i> @Model.RevenueGrowth.ToString("F1")%</span>
+                }
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h5><i class="fas fa-calendar-alt"></i> Doanh Thu Tháng Trước</h5>
+            <div class="metric-value">@string.Format("{0:N0}", Model.RevenueLastMonth) đ</div>
+        </div>
+
+        <div class="metric-card">
+            <h5><i class="fas fa-shopping-cart"></i> Đơn Hàng Tháng Này</h5>
+            <div class="metric-value">@Model.OrdersThisMonth</div>
+            <div class="metric-change @(Model.OrderGrowth >= 0 ? "positive" : "negative")">
+                @if (Model.OrderGrowth >= 0)
+                {
+                    <span><i class="fas fa-arrow-up"></i> +@Model.OrderGrowth.ToString("F1")%</span>
+                }
+                else
+                {
+                    <span><i class="fas fa-arrow-down"></i> @Model.OrderGrowth.ToString("F1")%</span>
+                }
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h5><i class="fas fa-users"></i> Khách Hàng Mới</h5>
+            <div class="metric-value">@Model.NewCustomersThisMonth</div>
+        </div>
+    </div>
+
+    <!-- Daily Revenue Chart -->
+    @if (Model.DailyRevenue != null && Model.DailyRevenue.Dates.Count > 0)
+    {
+        <div class="chart-container">
+            <h4><i class="fas fa-chart-line"></i> Doanh Thu Hàng Ngày</h4>
+            <canvas id="dailyRevenueChart"></canvas>
+        </div>
+    }
+
+    <!-- Category Performance -->
+    @if (Model.CategoryPerformance != null && Model.CategoryPerformance.Categories.Count > 0)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-chart-pie"></i> Hiệu Suất Danh Mục</h4>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-chart-bar"></i> Số Đơn Theo Danh Mục</h4>
+                    <canvas id="categoryOrderChart"></canvas>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Top Products Table -->
+    @if (Model.TopProducts != null && Model.TopProducts.ProductNames.Count > 0)
+    {
+        <div class="table-container">
+            <h4><i class="fas fa-star"></i> Top 10 Sản Phẩm Bán Chạy</h4>
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản Phẩm</th>
+                        <th>Số Lượng Bán</th>
+                        <th>Doanh Thu</th>
+                        <th>Đánh Giá Trung Bình</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.TopProducts.ProductNames.Count; i++)
+                    {
+                        <tr>
+                            <td><strong>@Model.TopProducts.ProductNames[i]</strong></td>
+                            <td><span class="badge bg-info">@Model.TopProducts.QuantitySold[i]</span></td>
+                            <td><span class="badge bg-success">@string.Format("{0:N0}", Model.TopProducts.Revenue[i]) đ</span></td>
+                            <td>
+                                <div>
+                                    @for (int j = 0; j < 5; j++)
+                                    {
+                                        if (j < (int)Model.TopProducts.AverageRating[i])
+                                        {
+                                            <i class="fas fa-star" style="color: gold;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star" style="color: #ccc;"></i>
+                                        }
+                                    }
+                                    (@string.Format("{0:F1}", Model.TopProducts.AverageRating[i]))
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Top Cities -->
+    @if (Model.TopCities != null && Model.TopCities.Count > 0)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-map-marker-alt"></i> Thành Phố Hàng Đầu</h4>
+                    <canvas id="citiesChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="table-container">
+                    <h4><i class="fas fa-list"></i> Chi Tiết Thành Phố</h4>
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Thành Phố</th>
+                                <th>Số Đơn Hàng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.TopCities.Count; i++)
+                            {
+                                <tr>
+                                    <td>@Model.TopCities[i]</td>
+                                    <td><span class="badge bg-primary">@Model.CityOrderCounts[i]</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Top Customers -->
+    @if (Model.CustomerAnalytics != null && Model.CustomerAnalytics.TopCustomers.Count > 0)
+    {
+        <div class="table-container">
+            <h4><i class="fas fa-user-circle"></i> 10 Khách Hàng Hàng Đầu</h4>
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tên Khách Hàng</th>
+                        <th>Tổng Chi Tiêu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.CustomerAnalytics.TopCustomers.Count; i++)
+                    {
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td><strong>@Model.CustomerAnalytics.TopCustomers[i]</strong></td>
+                            <td><span class="badge bg-success">@string.Format("{0:N0}", Model.CustomerAnalytics.CustomerSpending[i]) đ</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Order Status Distribution -->
+    @if (Model.OrderStatusNames != null && Model.OrderStatusNames.Count > 0)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-tasks"></i> Phân Bố Trạng Thái Đơn Hàng</h4>
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-credit-card"></i> Phương Thức Thanh Toán</h4>
+                    <canvas id="paymentMethodChart"></canvas>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Colors for charts
+            const colors = [
+                'rgb(102, 126, 234)',
+                'rgb(23, 162, 184)',
+                'rgb(40, 167, 69)',
+                'rgb(255, 193, 7)',
+                'rgb(220, 53, 69)',
+                'rgb(112, 76, 182)',
+                'rgb(255, 102, 99)',
+                'rgb(68, 157, 209)',
+                'rgb(153, 102, 255)',
+                'rgb(255, 159, 64)'
+            ];
+
+            // Daily Revenue Chart
+            @if (Model.DailyRevenue != null && Model.DailyRevenue.Dates.Count > 0)
+            {
+                <text>
+                var dailyCtx = document.getElementById('dailyRevenueChart').getContext('2d');
+                var dailyChart = new Chart(dailyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.DailyRevenue.Dates.Select(d => "\"" + d.ToString("dd/MM/yyyy") + "\"")))],
+                        datasets: [
+                            {
+                                label: 'Doanh Thu (đ)',
+                                data: [@Html.Raw(string.Join(",", Model.DailyRevenue.Revenue))],
+                                borderColor: 'rgb(102, 126, 234)',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointBackgroundColor: 'rgb(102, 126, 234)',
+                            },
+                            {
+                                label: 'Số Đơn Hàng',
+                                data: [@Html.Raw(string.Join(",", Model.DailyRevenue.OrderCount))],
+                                borderColor: 'rgb(23, 162, 184)',
+                                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                yAxisID: 'y1',
+                                fill: false,
+                                pointRadius: 4,
+                                pointBackgroundColor: 'rgb(23, 162, 184)',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Doanh Thu (đ)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Số Đơn Hàng'
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                }
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+
+            // Category Performance Chart
+            @if (Model.CategoryPerformance != null && Model.CategoryPerformance.Categories.Count > 0)
+            {
+                <text>
+                var categoryCtx = document.getElementById('categoryChart').getContext('2d');
+                var categoryChart = new Chart(categoryCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.CategoryPerformance.Categories.Select(c => "\"" + c + "\"")))],
+                        datasets: [{
+                            data: [@Html.Raw(string.Join(",", Model.CategoryPerformance.Sales))],
+                            backgroundColor: colors.slice(0, @Model.CategoryPerformance.Categories.Count),
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+
+                var categoryOrderCtx = document.getElementById('categoryOrderChart').getContext('2d');
+                var categoryOrderChart = new Chart(categoryOrderCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.CategoryPerformance.Categories.Select(c => "\"" + c + "\"")))],
+                        datasets: [{
+                            label: 'Số Đơn Hàng',
+                            data: [@Html.Raw(string.Join(",", Model.CategoryPerformance.OrderCount))],
+                            backgroundColor: 'rgb(102, 126, 234)',
+                            borderColor: 'rgb(102, 126, 234)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Số Đơn Hàng'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+
+            // Cities Chart
+            @if (Model.TopCities != null && Model.TopCities.Count > 0)
+            {
+                <text>
+                var citiesCtx = document.getElementById('citiesChart').getContext('2d');
+                var citiesChart = new Chart(citiesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.TopCities.Select(c => "\"" + c + "\"")))],
+                        datasets: [{
+                            label: 'Số Đơn Hàng',
+                            data: [@Html.Raw(string.Join(",", Model.CityOrderCounts))],
+                            backgroundColor: 'rgb(40, 167, 69)',
+                            borderColor: 'rgb(40, 167, 69)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+
+            // Order Status Chart
+            @if (Model.OrderStatusNames != null && Model.OrderStatusNames.Count > 0)
+            {
+                <text>
+                var orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+                var orderStatusChart = new Chart(orderStatusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.OrderStatusNames.Select(s => "\"" + s + "\"")))],
+                        datasets: [{
+                            data: [@Html.Raw(string.Join(",", Model.OrderStatusCounts))],
+                            backgroundColor: colors.slice(0, @Model.OrderStatusNames.Count),
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+
+            // Payment Method Chart
+            @if (Model.PaymentMethodNames != null && Model.PaymentMethodNames.Count > 0)
+            {
+                <text>
+                var paymentCtx = document.getElementById('paymentMethodChart').getContext('2d');
+                var paymentChart = new Chart(paymentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.PaymentMethodNames.Select(p => "\"" + p + "\"")))],
+                        datasets: [{
+                            data: [@Html.Raw(string.Join(",", Model.PaymentMethodCounts))],
+                            backgroundColor: colors.slice(0, @Model.PaymentMethodNames.Count),
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}

@@ -1,0 +1,84 @@
+﻿@model WebTH.Models.LoginViewModel
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<div class="card-body login-card-body">
+    <div class="text-center mb-4">
+        <h2 class="login-box-msg" style="color: #2c3e50; font-weight: 600;">Đăng nhập Quản lý</h2>
+        <p class="text-muted" style="font-size: 13px; margin-top: 5px;">Vui lòng nhập thông tin đăng nhập</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-exclamation-circle"></i> Lỗi đăng nhập!</strong>
+            @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { novalidate = "novalidate" }))
+    {
+        @Html.AntiForgeryToken();
+        
+        <div class="form-group mb-3">
+            <label for="UserName" class="form-label" style="color: #555; font-weight: 500; margin-bottom: 8px;">Tài khoản</label>
+            <div class="input-group">
+                @Html.TextBoxFor(x => x.UserName, new { @class = "form-control form-control-lg", @placeholder = "Nhập tài khoản của bạn", @autofocus = "autofocus" })
+                <div class="input-group-append">
+                    <span class="input-group-text" style="border-color: #ddd;">
+                        <i class="fas fa-user" style="color: #666;"></i>
+                    </span>
+                </div>
+            </div>
+            @Html.ValidationMessageFor(x => x.UserName, "", new { @class = "text-danger small mt-1" })
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Password" class="form-label" style="color: #555; font-weight: 500; margin-bottom: 8px;">Mật khẩu</label>
+            <div class="input-group">
+                @Html.PasswordFor(x => x.Password, new { @class = "form-control form-control-lg", @placeholder = "Nhập mật khẩu của bạn" })
+                <div class="input-group-append">
+                    <span class="input-group-text" style="border-color: #ddd;">
+                        <i class="fas fa-lock" style="color: #666;"></i>
+                    </span>
+                </div>
+            </div>
+            @Html.ValidationMessageFor(x => x.Password, "", new { @class = "text-danger small mt-1" })
+        </div>
+
+        <div class="row align-items-center mb-4">
+            <div class="col-auto">
+                <div class="custom-control custom-checkbox">
+                    @Html.CheckBoxFor(x => x.RememberMe, new { @class = "custom-control-input", id = "RememberMe" })
+                    <label class="custom-control-label" for="RememberMe" style="color: #555; margin-bottom: 0; cursor: pointer;">
+                        Ghi nhớ đăng nhập
+                    </label>
+                </div>
+            </div>
+            <div class="col text-right">
+                <a href="#" style="color: #3498db; font-size: 13px; text-decoration: none;">
+                    <i class="fas fa-question-circle"></i> Quên mật khẩu?
+                </a>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; font-weight: 600; padding: 12px 0; border-radius: 5px;">
+            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
+        </button>
+    }
+
+    <hr style="margin: 25px 0; border-color: #e0e0e0;" />
+    
+    <div class="text-center mt-3">
+        <p class="text-muted small" style="margin: 0;">
+            <i class="fas fa-shield-alt"></i> Trang đăng nhập được bảo mật
+        </p>
+    </div>
+</div>
+
+

@@ -1,0 +1,168 @@
+﻿@model WebTH.Models.VetClinic
+
+@{
+    ViewBag.Title = "Thêm Phòng Khám Mới";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">
+                <i class="fas fa-hospital"></i> Thêm Phòng Khám Thú Y Mới
+            </h1>
+
+            @using (Html.BeginForm("CreateClinic", "AdminVet", new { Area = "Admin" }, FormMethod.Post, new { @class = "" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Clinic Name -->
+                        <div class="form-group mb-3">
+                            <label for="ClinicName" class="form-label"><strong>Tên Phòng Khám *</strong></label>
+                            @Html.TextBoxFor(m => m.ClinicName, new { @class = "form-control", placeholder = "Nhập tên phòng khám" })
+                            @Html.ValidationMessageFor(m => m.ClinicName, "", new { @class = "text-danger small mt-1" })
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="Phone" class="form-label"><strong>Điện Thoại *</strong></label>
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "0xxx xxx xxx", type = "tel" })
+                                    @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="Email" class="form-label"><strong>Email</strong></label>
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "email@phongkham.com", type = "email" })
+                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Website -->
+                        <div class="form-group mb-3">
+                            <label for="Website" class="form-label"><strong>Website</strong></label>
+                            @Html.TextBoxFor(m => m.Website, new { @class = "form-control", placeholder = "https://website.com hoặc www.website.com" })
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-group mb-3">
+                            <label for="Address" class="form-label"><strong>Địa Chỉ *</strong></label>
+                            @Html.TextAreaFor(m => m.Address, new { @class = "form-control", placeholder = "Đường, nhà số", rows = 2 })
+                            @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger small mt-1" })
+                        </div>
+
+                        <!-- City & District -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="City" class="form-label"><strong>Thành Phố *</strong></label>
+                                    @Html.TextBoxFor(m => m.City, new { @class = "form-control", placeholder = "TP. Hồ Chí Minh" })
+                                    @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="District" class="form-label"><strong>Quận/Huyện</strong></label>
+                                    @Html.TextBoxFor(m => m.District, new { @class = "form-control", placeholder = "Quận 1" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Years in Business -->
+                        <div class="form-group mb-3">
+                            <label for="YearsInBusiness" class="form-label"><strong>Năm Kinh Doanh</strong></label>
+                            @Html.TextBoxFor(m => m.YearsInBusiness, new { @class = "form-control", placeholder = "2015", type = "number" })
+                        </div>
+
+                        <!-- Specializations -->
+                        <div class="form-group mb-3">
+                            <label for="SpecializationAreas" class="form-label"><strong>Lĩnh Vực Chuyên Môn</strong></label>
+                            <small class="form-text text-muted d-block mb-2">
+                                Phân cách bằng dấu phẩy (VD: Phẫu thuật, Da liễu, Nha khoa)
+                            </small>
+                            @Html.TextAreaFor(m => m.SpecializationAreas, new { @class = "form-control", placeholder = "Phẫu thuật, Da liễu, Nha khoa", rows = 2 })
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group mb-3">
+                            <label for="Description" class="form-label"><strong>Mô Tả Phòng Khám</strong></label>
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Mô tả chi tiết về phòng khám", rows = 3 })
+                        </div>
+
+                        <!-- Logo -->
+                        <div class="form-group mb-3">
+                            <label for="Logo" class="form-label"><strong>Logo Phòng Khám</strong></label>
+                            <div class="input-group">
+                                @Html.TextBoxFor(m => m.Logo, new { @class = "form-control", @id = "Logo", placeholder = "Đường dẫn logo" })
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" onclick="BrowseServer('Logo')">Chọn ảnh</button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                Nhấn "Chọn ảnh" để chọn logo từ thư viện ảnh.
+                            </small>
+                            <div class="mt-3" id="LogoPreview" style="display:none;">
+                                <p style="margin: 0 0 10px 0; color: #666; font-size: 0.9em;"><strong>Xem trước logo:</strong></p>
+                                <img id="PreviewLogo" src="" alt="Logo Preview" style="max-width: 150px; max-height: 100px; border-radius: 4px; object-fit: contain;" />
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Thêm Phòng Khám
+                            </button>
+                            <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            $('#Logo').on('change keyup', function () {
+                var logoPath = $(this).val().trim();
+                if (logoPath) {
+                    $('#PreviewLogo').attr('src', logoPath);
+                    $('#LogoPreview').show();
+                } else {
+                    $('#LogoPreview').hide();
+                }
+            });
+        });
+
+        function BrowseServer(field) {
+            var finder = new CKFinder();
+            finder.selectActionFunction = function (fileUrl) {
+                document.getElementById(field).value = fileUrl;
+                $('#' + field).trigger('change');
+            };
+            finder.popup();
+        }
+    </script>
+}
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+    }
+</style>

@@ -1,0 +1,148 @@
+﻿@model WebTH.Models.VetRecommendation
+
+@{
+    ViewBag.Title = "Sửa Khuyến Cáo";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h3><i class="fas fa-edit"></i> Sửa khuyến cáo</h3>
+            <p class="text-muted mb-0">Cập nhật nội dung khuyến cáo cho sản phẩm và phòng khám.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @using (Html.BeginForm("EditRecommendation", "AdminVet", FormMethod.Post, new { }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.Id)
+                @Html.Hidden("clinicId", (object)ViewBag.ReturnClinicId)
+                @Html.Hidden("filter", (object)ViewBag.ReturnFilter)
+                @Html.Hidden("page", (object)ViewBag.ReturnPage)
+                @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Phòng khám</label>
+                            @Html.DropDownListFor(x => x.ClinicId, ViewBag.ClinicList as SelectList, "-- Chọn phòng khám --", new { @class = "form-control", id = "ClinicId" })
+                            @Html.ValidationMessageFor(x => x.ClinicId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Bác sĩ (tùy chọn)</label>
+                            @Html.DropDownListFor(x => x.DoctorId, ViewBag.DoctorList as SelectList, "-- Không gắn bác sĩ --", new { @class = "form-control", id = "DoctorId" })
+                            @Html.ValidationMessageFor(x => x.DoctorId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Sản phẩm</label>
+                            @Html.DropDownListFor(x => x.ProductId, ViewBag.ProductList as SelectList, "-- Chọn sản phẩm --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.ProductId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Loại thú cưng</label>
+                            @Html.DropDownListFor(x => x.PetType, new List<SelectListItem>
+                            {
+                                new SelectListItem { Text = "Chó", Value = "Chó" },
+                                new SelectListItem { Text = "Mèo", Value = "Mèo" },
+                                new SelectListItem { Text = "Cả hai", Value = "Cả hai" }
+                            }, "-- Chọn loại thú --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.PetType, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Lý do khuyến cáo</label>
+                    @Html.TextAreaFor(x => x.ReccommendationReason, new { @class = "form-control", rows = 4, placeholder = "Nhập nội dung khuyến cáo..." })
+                    @Html.ValidationMessageFor(x => x.ReccommendationReason, null, new { @class = "text-danger" })
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Tình trạng sức khỏe</label>
+                            @Html.TextBoxFor(x => x.HealthCondition, new { @class = "form-control", placeholder = "Ví dụ: da nhạy cảm, tiêu hóa kém..." })
+                            @Html.ValidationMessageFor(x => x.HealthCondition, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Độ tuổi</label>
+                            @Html.TextBoxFor(x => x.PetAgeRange, new { @class = "form-control", placeholder = "Ví dụ: 0-3 tháng" })
+                            @Html.ValidationMessageFor(x => x.PetAgeRange, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Mức độ</label>
+                            @Html.DropDownListFor(x => x.RecommendationLevel, new List<SelectListItem>
+                            {
+                                new SelectListItem { Text = "Khuyến cáo", Value = "1" },
+                                new SelectListItem { Text = "Khuyến cáo mạnh", Value = "2" },
+                                new SelectListItem { Text = "Cần thiết", Value = "3" }
+                            }, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="custom-control custom-switch">
+                        @Html.CheckBoxFor(x => x.IsApproved, new { @class = "custom-control-input", id = "IsApproved" })
+                        <label class="custom-control-label" for="IsApproved">Đánh dấu đã duyệt</label>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group mb-0">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Cập nhật
+                    </button>
+                    <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ReturnClinicId, filter = ViewBag.ReturnFilter, page = ViewBag.ReturnPage })" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        (function () {
+            function loadDoctorsByClinic(clinicId, selectedDoctorId) {
+                var $doctor = $('#DoctorId');
+                $doctor.empty().append($('<option/>').val('').text('-- Không gắn bác sĩ --'));
+                if (!clinicId) {
+                    return;
+                }
+
+                $.get('@Url.Action("GetDoctorsByClinic", "AdminVet", new { Area = "Admin" })', { clinicId: clinicId })
+                    .done(function (res) {
+                        if (!res || !res.success || !res.data) return;
+                        $.each(res.data, function (_, item) {
+                            var opt = $('<option/>').val(item.Id).text(item.DoctorName);
+                            if (selectedDoctorId && parseInt(selectedDoctorId) === item.Id) {
+                                opt.prop('selected', true);
+                            }
+                            $doctor.append(opt);
+                        });
+                    });
+            }
+
+            $('#ClinicId').on('change', function () {
+                loadDoctorsByClinic($(this).val(), null);
+            });
+        })();
+    </script>
+}

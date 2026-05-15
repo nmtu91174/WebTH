@@ -1,0 +1,453 @@
+﻿@*@model PagedList.PagedList<WebTH.Models.EF.Wishlist>*@
+
+@model IEnumerable<WebTH.Models.EF.Wishlist>
+
+@using PagedList
+@using PagedList.Mvc
+@{
+    ViewBag.Title = "Sản phẩm yêu thích";
+}
+
+<style>
+    /* Wishlist Page Styles */
+    .wishlist-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .wishlist-banner h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .wishlist-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .wishlist-content {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 40px;
+        margin-bottom: 60px;
+    }
+
+    .wishlist-items {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .wishlist-item {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 25px;
+        padding: 25px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+        .wishlist-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .wishlist-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .wishlist-item-image {
+        width: 200px;
+        height: 200px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .wishlist-item-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+    .wishlist-item-info h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #222;
+        margin: 0 0 10px 0;
+    }
+
+        .wishlist-item-info h3 a {
+            color: #222;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .wishlist-item-info h3 a:hover {
+                color: #667eea;
+            }
+
+    .wishlist-meta {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 15px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .wishlist-description {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .wishlist-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-add-cart {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+    .btn-remove {
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-remove:hover {
+            background: #ff5252;
+        }
+
+    .empty-wishlist {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-wishlist-icon {
+        font-size: 80px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+
+    .empty-wishlist h3 {
+        font-size: 24px;
+        color: #222;
+        margin-bottom: 10px;
+    }
+
+    .empty-wishlist p {
+        color: #999;
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+
+    .empty-wishlist a {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 40px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .empty-wishlist a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+    .wishlist-sidebar {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .sidebar-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .sidebar-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .sidebar-list li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-list a {
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .sidebar-list a:hover {
+                color: #667eea;
+                margin-left: 5px;
+            }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 30px;
+    }
+
+        .pagination a,
+        .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #666;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+            .pagination a:hover {
+                border-color: #667eea;
+                color: #667eea;
+            }
+
+        .pagination .active span {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+    @@media (max-width: 768px) {
+        .wishlist-content {
+            grid-template-columns: 1fr;
+        }
+
+        .wishlist-item {
+            grid-template-columns: 150px 1fr;
+        }
+
+        .wishlist-item-image {
+            width: 150px;
+            height: 150px;
+        }
+
+        .wishlist-sidebar {
+            position: relative;
+            top: 0;
+        }
+
+        .wishlist-banner h1 {
+            font-size: 28px;
+        }
+    }
+</style>
+
+<section class="wishlist-banner">
+    <div class="wishlist-container">
+        <h1>@ViewBag.Title</h1>
+    </div>
+</section>
+
+<section class="wishlist-container" style="padding-bottom: 80px;">
+    <div class="wishlist-content">
+        <!-- Wishlist Items -->
+        <div class="wishlist-items">
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (var item in Model)
+                {
+                    //var strImage = "";
+                    //var img = item.Product.ProductImage.FirstOrDefault(x => x.IsDefault);
+                    //if (img != null)
+                    //{
+                    //    strImage = img.Image;
+                    //}
+
+                    // ✅ Thay bằng
+                    var strImage = !string.IsNullOrEmpty(item.Product.Image)
+                        ? (item.Product.Image.StartsWith("/") ? item.Product.Image : "/Uploads/images/sanpham/" + item.Product.Image)
+                        : "/Content/assets/images/placeholder.jpg";
+
+                    <div class="wishlist-item">
+                        <div class="wishlist-item-image">
+                            @*<a href="/@item.Product.Alias-n@(item.ProductId)">*@
+
+                            <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)">
+                                <img src="@strImage" alt="@item.Product.Title" />
+                            </a>
+                        </div>
+
+                        <div class="wishlist-item-info">
+                            <h3>
+                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)">@item.Product.Title</a>
+                            </h3>
+
+                            <div class="wishlist-meta">
+                                <span>Thêm lúc: @item.CreatedDate.ToString("dd/MM/yyyy")</span>
+                                <span>Danh mục: @item.Product.Alias</span>
+                            </div>
+
+                            <p class="wishlist-description">
+                                @item.Product.Description
+                            </p>
+
+                            <div class="wishlist-actions">
+                                <button class="btn-add-cart" onclick="addToCart(@item.ProductId)">
+                                    <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                </button>
+                                <button class="btn-remove" data-id="@item.Id" onclick="removeFromWishlist(@item.Id)">
+                                    <i class="fa fa-trash"></i> Xóa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Pagination -->
+                @*<div class="pagination">
+                        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+                    </div>*@
+            }
+            else
+            {
+                <div class="empty-wishlist">
+                    <div class="empty-wishlist-icon">
+                        <i class="fa fa-heart-o"></i>
+                    </div>
+                    <h3>Danh sách yêu thích trống</h3>
+                    <p>Bạn chưa thêm sản phẩm nào vào danh sách yêu thích.</p>
+                    <a href="/menu/list">Khám phá sản phẩm</a>
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar -->
+        <div class="wishlist-sidebar">
+            <h3 class="sidebar-title">
+                <i class="fa fa-filter"></i> Danh mục
+            </h3>
+            <ul class="sidebar-list">
+                <li><a href="/san-pham"><i class="fa fa-paw"></i> Tất cả sản phẩm</a></li>
+                <li><a href="/products/list?category=dog"><i class="fa fa-paw"></i> Sản phẩm cho chó</a></li>
+                <li><a href="/products/list?category=cat"><i class="fa fa-paw"></i> Sản phẩm cho mèo</a></li>
+                <li><a href="/products/list?category=other"><i class="fa fa-paw"></i> Sản phẩm khác</a></li>
+            </ul>
+
+            <h3 class="sidebar-title" style="margin-top: 30px;">
+                <i class="fa fa-info-circle"></i> Thông tin
+            </h3>
+            <ul class="sidebar-list">
+                <li><a href="/help/faq"><i class="fa fa-question-circle"></i> Hỏi đáp</a></li>
+                <li><a href="/help/guide"><i class="fa fa-book"></i> Hướng dẫn sử dụng</a></li>
+                <li><a href="/contact"><i class="fa fa-envelope"></i> Liên hệ</a></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+@*<script>
+        function removeFromWishlist(id) {
+            if (confirm('Bạn chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
+                // Add your remove logic here
+                console.log('Remove wishlist item:', id);
+            }
+        }
+
+        function addToCart(productId) {
+            // Add your add to cart logic here
+            console.log('Add to cart:', productId);
+        }
+    </script>*@
+
+<script>
+    function removeFromWishlist(productId) {
+        if (!confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) return;
+
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            url: '/Wishlist/PostDeleteWishlist',
+            type: 'POST',
+            data: { ProductId: productId, __RequestVerificationToken: token },
+            success: function (rs) {
+                if (rs.Success) {
+                    location.reload(); // Reload lại trang để cập nhật danh sách
+                } else {
+                    alert(rs.Message || 'Xóa thất bại!');
+                }
+            },
+            error: function () {
+                alert('Có lỗi xảy ra, vui lòng thử lại!');
+            }
+        });
+    }
+
+    function addToCart(productId) {
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            url: '/shoppingcart/addtocart',
+            type: 'POST',
+            data: { id: productId, quantity: 1, __RequestVerificationToken: token },
+            success: function (rs) {
+                if (rs.Success) {
+                    $('#checkout_items').html(rs.Count);
+                    alert('Đã thêm vào giỏ hàng!');
+                } else {
+                    alert(rs.msg || 'Thêm vào giỏ thất bại!');
+                }
+            },
+            error: function () {
+                alert('Có lỗi xảy ra, vui lòng thử lại!');
+            }
+        });
+    }
+</script>

@@ -1,0 +1,622 @@
+﻿@model WebTH.Models.AnalyticsOverviewViewModel
+
+@{
+    ViewBag.Title = "Bảng điều khiển Phân tích";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .analytics-container {
+        background: #f5f6fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #007bff;
+    }
+
+    .metric-card.success {
+        border-left-color: #28a745;
+    }
+
+    .metric-card.danger {
+        border-left-color: #dc3545;
+    }
+
+    .metric-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin: 10px 0;
+    }
+
+    .metric-label {
+        font-size: 14px;
+        color: #666;
+        text-transform: uppercase;
+    }
+
+    .metric-change {
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .metric-change.up {
+        color: #28a745;
+    }
+
+    .metric-change.down {
+        color: #dc3545;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-filter {
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .btn-filter:hover {
+        background: #0056b3;
+    }
+
+    .apexcharts-canvas {
+        display: block;
+    }
+
+    .no-data {
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 18px;
+        background: #ffffff;
+        border-radius: 6px;
+    }
+    .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+    }
+
+    @@media (max-width: 768px) {
+        .grid-3, .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        background: #f5f6fa;
+        border: none;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .tab-btn.active {
+        border-bottom-color: #007bff;
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+</style>
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">📊 Bảng điều khiển Phân tích</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Từ ngày</label>
+                    <input type="date" id="fromDate" class="form-control" value="@DateTime.Now.AddMonths(-12).ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-3">
+                    <label>Đến ngày</label>
+                    <input type="date" id="toDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-6">
+                    <button class="btn-filter" onclick="filterData()">🔍 Lọc dữ liệu</button>
+                    <button class="btn-filter" onclick="exportToExcel()" style="background: #28a745;">📥 Xuất Excel</button>
+                    <button class="btn-filter" onclick="exportToPDF()" style="background: #dc3545;">📄 Xuất PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid-3">
+            <div class="metric-card success">
+                <div class="metric-label">Tổng doanh thu</div>
+                <div class="metric-value">$@Model.TotalRevenue.ToString("N2")</div>
+                <div class="metric-change up">+@Model.RevenueGrowth.ToString("N1")% tháng này</div>
+            </div>
+
+            <div class="metric-card success">
+                <div class="metric-label">Tổng đơn hàng</div>
+                <div class="metric-value">@Model.TotalOrders</div>
+                <div class="metric-change up">+@Model.OrderGrowth.ToString("N1")% tháng này</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Giá trị trung bình đơn hàng</div>
+                <div class="metric-value">$@Model.AverageOrderValue.ToString("N2")</div>
+                <div class="metric-change">Tổng khách hàng: @Model.TotalCustomers</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Khách hàng mới</div>
+                <div class="metric-value">@Model.NewCustomersThisMonth</div>
+                <div class="metric-change">Tháng này</div>
+            </div>
+
+            <div class="metric-card success">
+                <div class="metric-label">Tỷ lệ Chuyển đổi</div>
+                <div class="metric-value">@Model.ConversionRate.ToString("N2")%</div>
+                <div class="metric-change">Đơn hàng / Khách hàng</div>
+            </div>
+
+            <div class="metric-card success">
+                <div class="metric-label">Tỷ lệ Giữ Khách hàng</div>
+                <div class="metric-value">@Model.CustomerRetentionRate.ToString("N2")%</div>
+                <div class="metric-change">So với tháng trước</div>
+            </div>
+        </div>
+
+        <!-- Tabs for Different Views -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('revenue')">Phân tích Doanh thu</button>
+            <button class="tab-btn" onclick="switchTab('products')">Hiệu suất Sản phẩm</button>
+            <button class="tab-btn" onclick="switchTab('customers')">Phân tích Khách hàng</button>
+            <button class="tab-btn" onclick="switchTab('orders')">Phân bố Đơn hàng</button>
+        </div>
+
+        <!-- Tab 1: Revenue Analysis -->
+        <div id="revenue" class="tab-content active">
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Doanh thu & Đơn hàng theo ngày</h4>
+                    <div id="dailyRevenueChart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>Hiệu suất theo danh mục</h4>
+                    <div id="categoryChart"></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Doanh số theo Thành phố / Khu vực</h4>
+                    <div id="cityChart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>Phương thức thanh toán</h4>
+                    <div id="paymentChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Product Performance -->
+        <div id="products" class="tab-content">
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Top 10 Sản phẩm bán chạy</h4>
+                    <div id="topProductsChart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>Phân bố doanh thu sản phẩm</h4>
+                    <div id="productRevenueChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Customer Analytics -->
+        <div id="customers" class="tab-content">
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Top 10 Khách hàng theo chi tiêu</h4>
+                    <div id="topCustomersChart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>Phân bố chi tiêu khách hàng</h4>
+                    <div id="customerSpendingChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Order Distribution -->
+        <div id="orders" class="tab-content">
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Phân bố trạng thái đơn hàng</h4>
+                    <div id="orderStatusChart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>Phân bố giá trị đơn hàng</h4>
+                    <div id="orderValueChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.0/apexcharts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+
+    <script>
+        // Color Schemes
+        const colors = {
+            primary: '#007bff',
+            success: '#28a745',
+            danger: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8',
+            secondary: '#6c757d'
+        };
+
+        // small helpers to show placeholder when there's no data
+        function hasValues(arr) {
+            return Array.isArray(arr) && arr.length > 0;
+        }
+
+        function isAllZero(arr) {
+            return false; // Always allow rendering, even if all zeros
+        }
+
+        function showNoData(selector) {
+            const el = document.querySelector(selector);
+            if (el) el.innerHTML = '<div class="no-data">Chưa có dữ liệu</div>';
+        }
+
+        // Initialize all charts with data
+        function initializeCharts(data) {
+            if (data.DailyRevenue) {
+                createDailyRevenueChart(data.DailyRevenue);
+            }
+            if (data.CategoryPerformance) {
+                createCategoryChart(data.CategoryPerformance);
+            }
+            if (data.TopProducts) {
+                createTopProductsChart(data.TopProducts);
+            }
+            if (data.CustomerAnalytics) {
+                createTopCustomersChart(data.CustomerAnalytics);
+            }
+            if (data.TopCities && data.CityOrderCounts) {
+                createCityChart(data.TopCities, data.CityOrderCounts);
+            }
+            if (data.OrderStatusNames && data.OrderStatusCounts) {
+                createOrderStatusChart(data.OrderStatusNames, data.OrderStatusCounts);
+            }
+            if (data.PaymentMethodNames && data.PaymentMethodCounts) {
+                createPaymentChart(data.PaymentMethodNames, data.PaymentMethodCounts);
+            }
+
+            // Product Revenue Distribution - use TopProducts data
+            if (data.TopProducts && data.TopProducts.ProductNames && data.TopProducts.ProductNames.length > 0) {
+                createProductRevenueChart(data.TopProducts);
+            } else {
+                showNoData('#productRevenueChart');
+            }
+
+            // Customer Spending Distribution - use CustomerAnalytics data
+            if (data.CustomerAnalytics && data.CustomerAnalytics.CustomerSpending && data.CustomerAnalytics.CustomerSpending.length > 0) {
+                createCustomerSpendingChart(data.CustomerAnalytics);
+            } else {
+                showNoData('#customerSpendingChart');
+            }
+
+            // Order Value Distribution - use CategoryPerformance data as proxy
+            if (data.CategoryPerformance && data.CategoryPerformance.Categories && data.CategoryPerformance.Categories.length > 0) {
+                createOrderValueChart(data.CategoryPerformance);
+            } else {
+                showNoData('#orderValueChart');
+            }
+        }
+
+        // Daily Revenue Chart
+        function createDailyRevenueChart(data) {
+            if (!data || !data.Dates || data.Dates.length === 0) {
+                showNoData('#dailyRevenueChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'area', height: 400, stacked: false },
+                series: [
+                    {
+                        name: 'Doanh thu',
+                        data: data.Revenue,
+                        color: colors.success
+                    },
+                    {
+                        name: 'Đơn hàng',
+                        data: data.OrderCount,
+                        color: colors.primary
+                    }
+                ],
+                xaxis: {
+                    categories: data.Dates.map(d => new Date(d).toLocaleDateString())
+                },
+                yaxis: [
+                    { title: { text: 'Doanh thu (₫)' } },
+                    { opposite: true, title: { text: 'Đơn hàng' } }
+                ],
+                stroke: { curve: 'smooth', width: 2 }
+            };
+            new ApexCharts(document.querySelector('#dailyRevenueChart'), options).render();
+        }
+
+        // Category Performance Chart
+        function createCategoryChart(data) {
+            if (!data || !Array.isArray(data.Categories) || data.Categories.length === 0) {
+                showNoData('#categoryChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'bar', height: 400 },
+                series: [
+                    {
+                        name: 'Doanh thu',
+                        data: data.Sales,
+                        color: colors.success
+                    },
+                    {
+                        name: 'Đơn hàng',
+                        data: data.OrderCount,
+                        color: colors.primary
+                    }
+                ],
+                xaxis: { categories: data.Categories },
+                plotOptions: { bar: { horizontal: false, columnWidth: '55%' } }
+            };
+            new ApexCharts(document.querySelector('#categoryChart'), options).render();
+        }
+
+        // Top Products Chart
+        function createTopProductsChart(data) {
+            if (!data || !Array.isArray(data.ProductNames) || data.ProductNames.length === 0) {
+                showNoData('#topProductsChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'bar', height: 400 },
+                series: [{
+                    name: 'Số lượng bán',
+                    data: data.QuantitySold,
+                    color: colors.info
+                }],
+                xaxis: { categories: data.ProductNames },
+                plotOptions: { bar: { horizontal: true } }
+            };
+            new ApexCharts(document.querySelector('#topProductsChart'), options).render();
+        }
+
+        // Top Customers Chart
+        function createTopCustomersChart(data) {
+            if (!data || !Array.isArray(data.TopCustomers) || data.TopCustomers.length === 0) {
+                showNoData('#topCustomersChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'bar', height: 400 },
+                series: [{
+                    name: 'Tổng chi tiêu (₫)',
+                    data: data.CustomerSpending,
+                    color: colors.warning
+                }],
+                xaxis: { categories: data.TopCustomers },
+                plotOptions: { bar: { horizontal: true } }
+            };
+            new ApexCharts(document.querySelector('#topCustomersChart'), options).render();
+        }
+
+        // Customer Spending Distribution Chart
+        function createCustomerSpendingChart(data) {
+            if (!data || !Array.isArray(data.CustomerSpending) || data.CustomerSpending.length === 0) {
+                showNoData('#customerSpendingChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'pie', height: 400 },
+                series: data.CustomerSpending,
+                labels: data.TopCustomers,
+                colors: [colors.primary, colors.success, colors.info, colors.warning, colors.danger, '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#adb5bd']
+            };
+            new ApexCharts(document.querySelector('#customerSpendingChart'), options).render();
+        }
+
+        // Product Revenue Distribution Chart
+        function createProductRevenueChart(data) {
+            if (!data || !Array.isArray(data.ProductNames) || data.ProductNames.length === 0) {
+                showNoData('#productRevenueChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'pie', height: 400 },
+                series: data.Revenue,
+                labels: data.ProductNames,
+                colors: [colors.primary, colors.success, colors.info, colors.warning, colors.danger, '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#adb5bd']
+            };
+            new ApexCharts(document.querySelector('#productRevenueChart'), options).render();
+        }
+
+        // Order Value Distribution Chart
+        function createOrderValueChart(data) {
+            if (!data || !Array.isArray(data.Categories) || data.Categories.length === 0) {
+                showNoData('#orderValueChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'bar', height: 400 },
+                series: [{
+                    name: 'Doanh thu',
+                    data: data.Sales,
+                    color: colors.success
+                }],
+                xaxis: { categories: data.Categories },
+                plotOptions: { bar: { horizontal: true } }
+            };
+            new ApexCharts(document.querySelector('#orderValueChart'), options).render();
+        }
+
+        // City Chart
+        function createCityChart(cities, counts) {
+            if (!Array.isArray(cities) || cities.length === 0 || !Array.isArray(counts) || counts.length === 0) {
+                showNoData('#cityChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'pie', height: 400 },
+                series: counts,
+                labels: cities,
+                colors: [colors.primary, colors.success, colors.info, colors.warning, colors.danger, '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#adb5bd']
+            };
+            new ApexCharts(document.querySelector('#cityChart'), options).render();
+        }
+
+        // Order Status Chart
+        function createOrderStatusChart(statusNames, statusCounts) {
+            if (!Array.isArray(statusNames) || statusNames.length === 0 || !Array.isArray(statusCounts) || statusCounts.length === 0) {
+                showNoData('#orderStatusChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'donut', height: 400 },
+                series: statusCounts,
+                labels: statusNames,
+                colors: [colors.info, colors.primary, colors.success, colors.warning, colors.danger]
+            };
+            new ApexCharts(document.querySelector('#orderStatusChart'), options).render();
+        }
+
+        // Payment Method Chart
+        function createPaymentChart(paymentNames, paymentCounts) {
+            if (!Array.isArray(paymentNames) || paymentNames.length === 0 || !Array.isArray(paymentCounts) || paymentCounts.length === 0) {
+                showNoData('#paymentChart');
+                return;
+            }
+
+            const options = {
+                chart: { type: 'pie', height: 400 },
+                series: paymentCounts,
+                labels: paymentNames,
+                colors: [colors.primary, colors.success, colors.info, colors.warning, colors.danger]
+            };
+            new ApexCharts(document.querySelector('#paymentChart'), options).render();
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Filter Data
+        function filterData() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            if (!fromDate || !toDate) {
+                alert('Vui lòng chọn cả hai ngày');
+                return;
+            }
+
+            location.reload();
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            window.location.href = '@Url.Action("ExportExcel", "Analytics", new { area = "Admin" })' + '?fromDate=' + fromDate + '&toDate=' + toDate;
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            window.location.href = '@Url.Action("ExportPDF", "Analytics", new { area = "Admin" })' + '?fromDate=' + fromDate + '&toDate=' + toDate;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+            initializeCharts(data);
+        });
+    </script>
+}

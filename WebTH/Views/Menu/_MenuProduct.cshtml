@@ -1,0 +1,94 @@
+﻿@model IEnumerable<WebTH.Models.EF.ProductCategory>
+
+@if (Model != null && Model.Any())
+{
+<div class="wrap-label-gallery filter-tope-group size27 flex-w flex-sb-m m-l-r-auto flex-col-c-sm p-l-15 p-r-15 m-b-60">
+    <button class="label-gallery txt26 trans-0-4 is-actived" data-filter="*">
+        Tất cả
+    </button>
+    @foreach (var item in Model)
+    {
+        <button class="label-gallery txt26 trans-0-4" data-filter="@("." + item.Alias)">
+            @item.Title
+        </button>
+    }
+
+</div>
+    <div class="wrap-gallery isotope-grid flex-w p-l-25 p-r-25">
+    </div>
+   
+    <script>
+        $(function(){
+            var $grid = $('.isotope-grid');
+
+            function loadProducts(page) {
+                $.get('@Url.Action("Partial_ItemByCateId", "ProductList")', { page: page || 1 }, function(data){
+                $grid.html(data);
+                
+                // Reinitialize Isotope with better layout
+                $grid.isotope({
+                    itemSelector: '.isotope-item',
+                    percentPosition: true,
+                    animationEngine : 'best-available',
+                    masonry: {
+                        columnWidth: '.isotope-item',
+                        isFitWidth: true
+                    }
+                });
+
+                // Re-bind filter events after new content loads
+                var $filter = $('.filter-tope-group');
+                $filter.each(function () {
+                    $filter.off('click').on('click', 'button', function () {
+                        var filterValue = $(this).attr('data-filter');
+                        $grid.isotope({filter: filterValue});
+                    });
+                });
+
+                $grid.off('click', '.product-list-pager a').on('click', '.product-list-pager a', function (e) {
+                    e.preventDefault();
+                    var href = $(this).attr('href') || '';
+                    var match = href.match(/[?&]page=(\d+)/);
+                    var nextPage = match ? parseInt(match[1], 10) : 1;
+                    loadProducts(nextPage);
+                });
+            });
+            }
+
+            // Load first page initially
+            loadProducts(1);
+        });
+    </script>
+
+    <style>
+        .wrap-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .isotope-item {
+            width: calc(25% - 15px);
+            margin-bottom: 20px;
+        }
+
+        @@media (max-width: 1200px) {
+            .isotope-item {
+                width: calc(33.333% - 15px);
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .isotope-item {
+                width: calc(50% - 15px);
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .isotope-item {
+                width: 100%;
+            }
+        }
+    </style>
+}

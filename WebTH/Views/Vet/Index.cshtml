@@ -1,0 +1,354 @@
+﻿@model IEnumerable<WebTH.Models.VetClinic>
+
+@{
+    ViewBag.Title = "Danh sách Phòng Khám Thú Y";
+    var clinics = Model != null ? Model.ToList() : new List<WebTH.Models.VetClinic>();
+    var currentCity = ViewBag.CurrentCity != null ? ViewBag.CurrentCity.ToString() : string.Empty;
+}
+
+<section class="vet-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="hero-badge"><i class="fa fa-shield"></i> Phòng khám đã xác minh</span>
+                <h1>Hệ Thống Phòng Khám Thú Y Uy Tín</h1>
+                <p>Tìm phòng khám phù hợp cho thú cưng theo khu vực, đánh giá và mức độ khuyến nghị từ bác sĩ thú y.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat-item">
+                        <strong>@clinics.Count</strong>
+                        <span>phòng khám hiển thị</span>
+                    </div>
+                    <div class="hero-stat-item">
+                        <strong>@(ViewBag.TotalPages ?? 1)</strong>
+                        <span>trang kết quả</span>
+                    </div>
+                    <div class="hero-stat-item">
+                        <strong>@(string.IsNullOrWhiteSpace(currentCity) ? "Toàn quốc" : currentCity)</strong>
+                        <span>khu vực lọc</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="hero-actions">
+                    <a href="@Url.Action("TopRated", "Vet")" class="btn btn-warning btn-lg btn-block">
+                        <i class="fa fa-star mr-2"></i> Top phòng khám
+                    </a>
+                    <a href="@Url.Action("Index", "Vet")" class="btn btn-outline-light btn-lg btn-block">
+                        <i class="fa fa-refresh mr-2"></i> Xem tất cả
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container vet-page-content">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card filter-card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6 mb-3 mb-lg-0">
+                    <label class="filter-label">Tìm theo tên/địa chỉ</label>
+                    <form method="get" action="@Url.Action("Search", "Vet")">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Ví dụ: Quận 1, Sài Gòn Pet...">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fa fa-search mr-1"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-6">
+                    <label class="filter-label">Lọc theo thành phố</label>
+                    <form method="get" action="@Url.Action("Index", "Vet")">
+                        <div class="input-group">
+                            <input type="text" name="city" class="form-control" value="@currentCity" placeholder="Ví dụ: Hà Nội, TP.HCM">
+                            <input type="hidden" name="page" value="1" />
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="fa fa-filter mr-1"></i> Lọc
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (clinics.Any())
+    {
+        <div class="row">
+            @foreach (var clinic in clinics)
+            {
+                var specialization = string.IsNullOrWhiteSpace(clinic.SpecializationAreas)
+                    ? "Đang cập nhật"
+                    : clinic.SpecializationAreas.Replace("[", "").Replace("]", "").Replace("\"", "");
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card clinic-card h-100">
+                        <div class="clinic-media">
+                            @if (!string.IsNullOrEmpty(clinic.Logo))
+                            {
+                                <img src="@clinic.Logo" alt="@clinic.ClinicName" />
+                            }
+                            else
+                            {
+                                <div class="clinic-media-placeholder">
+                                    <i class="fa fa-hospital-o"></i>
+                                </div>
+                            }
+                            <span class="badge badge-success verified-badge"><i class="fa fa-check-circle mr-1"></i>Đã xác minh</span>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="clinic-title">
+                                <a href="@Url.Action("Details", "Vet", new { id = clinic.Id })">@clinic.ClinicName</a>
+                            </h5>
+
+                            <div class="clinic-rating mb-2">
+                                <span class="badge badge-warning"><i class="fa fa-star mr-1"></i>@clinic.AverageRating.ToString("F1")</span>
+                                <small class="text-muted">@clinic.TotalRecommendations khuyến cáo</small>
+                            </div>
+
+                            <p class="small text-muted mb-2">
+                                <i class="fa fa-map-marker text-danger mr-1"></i>
+                                @clinic.Address
+                            </p>
+                            <p class="small text-muted mb-2">
+                                <i class="fa fa-phone text-primary mr-1"></i>
+                                @(string.IsNullOrWhiteSpace(clinic.Phone) ? "Đang cập nhật" : clinic.Phone)
+                            </p>
+                            <p class="small text-muted mb-3">
+                                <i class="fa fa-stethoscope text-info mr-1"></i>
+                                @specialization
+                            </p>
+
+                            <div class="mt-auto">
+                                <a href="@Url.Action("Details", "Vet", new { id = clinic.Id })" class="btn btn-primary btn-block">
+                                    <i class="fa fa-eye mr-1"></i> Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-4">
+            <i class="fa fa-info-circle mr-1"></i> Chưa có phòng khám phù hợp với bộ lọc hiện tại.
+        </div>
+    }
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        int currentPage = ViewBag.CurrentPage;
+        int totalPages = ViewBag.TotalPages;
+
+        <nav aria-label="Vet paging" class="mb-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Vet", new { page = currentPage - 1, city = currentCity })" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Vet", new { page = i, city = currentCity })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Vet", new { page = currentPage + 1, city = currentCity })" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</section>
+
+<style>
+    .vet-hero {
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: #fff;
+        padding: 56px 0;
+        margin-bottom: 28px;
+    }
+
+    .vet-hero h1 {
+        font-size: 2.1rem;
+        font-weight: 700;
+        margin: 12px 0 12px;
+    }
+
+    .vet-hero p {
+        margin-bottom: 16px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    .hero-badge i {
+        margin-right: 6px;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .hero-stat-item {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 10px 14px;
+        min-width: 148px;
+    }
+
+    .hero-stat-item strong {
+        display: block;
+        font-size: 1.1rem;
+        line-height: 1.1;
+    }
+
+    .hero-stat-item span {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+
+    .hero-actions .btn {
+        font-weight: 600;
+    }
+
+    .vet-page-content {
+        margin-bottom: 32px;
+    }
+
+    .filter-card {
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 8px 22px rgba(16, 24, 40, 0.08);
+    }
+
+    .filter-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .clinic-card {
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(16, 24, 40, 0.08);
+        overflow: hidden;
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .clinic-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(16, 24, 40, 0.14);
+    }
+
+    .clinic-media {
+        position: relative;
+        height: 210px;
+        background: #f4f7fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .clinic-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .clinic-media-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 3rem;
+    }
+
+    .verified-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border-radius: 999px;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.35);
+    }
+
+    .clinic-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        line-height: 1.35;
+    }
+
+    .clinic-title a {
+        color: #1f2937;
+        text-decoration: none;
+    }
+
+    .clinic-title a:hover {
+        color: #0d6efd;
+    }
+
+    .clinic-rating {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .pagination .page-link {
+        color: #0d6efd;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    @@media (max-width: 991px) {
+        .vet-hero {
+            padding: 40px 0;
+        }
+
+        .vet-hero h1 {
+            font-size: 1.65rem;
+        }
+    }
+</style>
+

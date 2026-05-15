@@ -1,0 +1,308 @@
+﻿@model IEnumerable<WebTH.Models.VetRecommendation>
+
+@{
+    ViewBag.Title = "Quản Lý Khuyến Cáo";
+    int? selectedClinicId = null;
+    if (ViewBag.ClinicId != null)
+    {
+        selectedClinicId = Convert.ToInt32(ViewBag.ClinicId);
+    }
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1><i class="fas fa-check-circle"></i> Quản Lý Khuyến Cáo</h1>
+                <p class="text-muted mb-0">Phòng khám: <strong>@ViewBag.ClinicName</strong></p>
+            </div>
+            <a href="@Url.Action("CreateRecommendation", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId })" class="btn btn-primary mt-2 mt-md-0">
+                <i class="fas fa-plus"></i> Thêm khuyến cáo
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-body">
+            @using (Html.BeginForm("RecommendationList", "AdminVet", FormMethod.Get, new { @class = "row align-items-end" }))
+            {
+                <div class="col-md-4 mb-2">
+                    <label class="mb-1"><strong>Chọn phòng khám</strong></label>
+                    @Html.DropDownList("clinicId", ViewBag.ClinicSelectList as SelectList, "Tất cả phòng khám", new { @class = "form-control" })
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label class="mb-1"><strong>Trạng thái</strong></label>
+                    <select name="filter" class="form-control">
+                        <option value="all" @(ViewBag.Filter == "all" ? "selected" : "")>Tất cả</option>
+                        <option value="pending" @(ViewBag.Filter == "pending" ? "selected" : "")>Chờ duyệt</option>
+                        <option value="approved" @(ViewBag.Filter == "approved" ? "selected" : "")>Đã duyệt</option>
+                        <option value="rejected" @(ViewBag.Filter == "rejected" ? "selected" : "")>Đã từ chối</option>
+                    </select>
+                </div>
+                <div class="col-md-5 mb-2">
+                    <button type="submit" class="btn btn-outline-primary mr-2">
+                        <i class="fas fa-filter"></i> Lọc danh sách
+                    </button>
+                    <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", filter = "all" })" class="btn btn-outline-secondary">
+                        <i class="fas fa-sync-alt"></i> Bỏ lọc
+                    </a>
+                </div>
+            }
+
+            <hr class="mt-3 mb-2" />
+            <div class="btn-group" role="group">
+                <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId, filter = "all" })"
+                   class="btn btn-sm @(ViewBag.Filter == "all" || ViewBag.Filter == "" ? "btn-primary active" : "btn-outline-primary")">
+                    <i class="fas fa-list"></i> Tất cả (@(Convert.ToInt32(ViewBag.PendingCount) + Convert.ToInt32(ViewBag.ApprovedCount)))
+                </a>
+                <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId, filter = "pending" })"
+                   class="btn btn-sm @(ViewBag.Filter == "pending" ? "btn-warning active" : "btn-outline-warning")">
+                    <i class="fas fa-clock"></i> Chờ duyệt (@ViewBag.PendingCount)
+                </a>
+                <a href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId, filter = "approved" })"
+                   class="btn btn-sm @(ViewBag.Filter == "approved" ? "btn-success active" : "btn-outline-success")">
+                    <i class="fas fa-check"></i> Đã duyệt (@ViewBag.ApprovedCount)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Loại thú</th>
+                        <th>Lý do khuyến cáo</th>
+                        <th>Mức độ</th>
+                        <th>Bác sĩ</th>
+                        <th>Ngày</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rec in Model)
+                    {
+                        var reason = string.IsNullOrWhiteSpace(rec.ReccommendationReason) ? "-" : rec.ReccommendationReason;
+                        var shortReason = reason.Length > 40 ? reason.Substring(0, 40) + "..." : reason;
+
+                        <tr>
+                            <td>
+                                @if (rec.Product != null)
+                                {
+                                    <strong>@rec.Product.Title</strong>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge badge-info">@(string.IsNullOrWhiteSpace(rec.PetType) ? "-" : rec.PetType)</span>
+                            </td>
+                            <td>
+                                <small>@shortReason</small>
+                            </td>
+                            <td>
+                                @{
+                                    string badgeColor = rec.RecommendationLevel == 3 ? "danger" : rec.RecommendationLevel == 2 ? "warning" : "info";
+                                    string levelText = rec.RecommendationLevel == 3 ? "Cần thiết" : rec.RecommendationLevel == 2 ? "Khuyến cáo mạnh" : "Khuyến cáo";
+                                }
+                                <span class="badge badge-@badgeColor">@levelText</span>
+                            </td>
+                            <td>
+                                @if (rec.VetDoctor != null)
+                                {
+                                    <small>@rec.VetDoctor.DoctorName</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                <small>@rec.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                            </td>
+                            <td>
+                                @if (rec.IsApproved)
+                                {
+                                    <span class="badge badge-success"><i class="fas fa-check"></i> Đã duyệt</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning"><i class="fas fa-clock"></i> Chờ duyệt</span>
+                                }
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="@Url.Action("EditRecommendation", "AdminVet", new { Area = "Admin", id = rec.Id, clinicId = selectedClinicId, filter = ViewBag.Filter, page = ViewBag.CurrentPage })"
+                                   class="btn btn-sm btn-primary" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                @if (!rec.IsApproved)
+                                {
+                                    <button class="btn btn-sm btn-success approve-btn" data-rec-id="@rec.Id" title="Phê duyệt">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-btn" data-rec-id="@rec.Id" title="Từ chối">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                }
+
+                                <button class="btn btn-sm btn-info"
+                                        data-toggle="modal"
+                                        data-target="#detailModal"
+                                        data-rec-id="@rec.Id"
+                                        data-product="@(rec.Product != null ? rec.Product.Title : "-")"
+                                        data-reason="@reason"
+                                        title="Chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Count() == 0)
+        {
+            <div class="alert alert-info m-0">
+                <i class="fas fa-info-circle"></i> Không có khuyến cáo nào để hiển thị.
+            </div>
+        }
+    </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId, filter = ViewBag.Filter, page = ViewBag.CurrentPage - 1 })">
+                        Trước
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId, filter = ViewBag.Filter, page = i })">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("RecommendationList", "AdminVet", new { Area = "Admin", clinicId = selectedClinicId, filter = ViewBag.Filter, page = ViewBag.CurrentPage + 1 })">
+                        Tiếp
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+
+    <div class="mt-4">
+        <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Chi tiết khuyến cáo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label><strong>Sản phẩm:</strong></label>
+                    <p id="modalProduct"></p>
+                </div>
+                <div class="mb-3">
+                    <label><strong>Lý do khuyến cáo:</strong></label>
+                    <p id="modalReason"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#detailModal').on('show.bs.modal', function (e) {
+                var button = $(e.relatedTarget);
+                $(this).find('#modalProduct').text(button.data('product'));
+                $(this).find('#modalReason').text(button.data('reason'));
+            });
+
+            $('.approve-btn').click(function () {
+                var recId = $(this).data('rec-id');
+                if (confirm('Bạn có chắc chắn muốn phê duyệt khuyến cáo này?')) {
+                    $.post('@Url.Action("ApproveRecommendation", "AdminVet", new { Area = "Admin" })',
+                        { id: recId },
+                        function (response) {
+                            if (response && response.success) {
+                                location.reload();
+                            }
+                        });
+                }
+            });
+
+            $('.reject-btn').click(function () {
+                var recId = $(this).data('rec-id');
+                if (confirm('Bạn có chắc chắn muốn từ chối khuyến cáo này?')) {
+                    $.post('@Url.Action("RejectRecommendation", "AdminVet", new { Area = "Admin" })',
+                        { id: recId },
+                        function (response) {
+                            if (response && response.success) {
+                                location.reload();
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .btn-group .btn {
+        border-radius: 0.25rem;
+    }
+</style>

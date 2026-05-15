@@ -1,0 +1,28 @@
+﻿@model List<WebTH.Models.EF.Product>
+
+@foreach (var product in Model ?? new List<WebTH.Models.EF.Product>())
+{
+    // Lấy danh sách ảnh từ ProductImage, nếu không có thì dùng ảnh chính
+    var images = product.ProductImage != null && product.ProductImage.Count > 0 
+        ? product.ProductImage.Select(p => p.Image).ToList() 
+        : (string.IsNullOrEmpty(product.Image) 
+            ? new List<string> { "/Content/assets/images/photo-product-thumb-1.jpg" }
+            : new List<string> { product.Image });
+
+    foreach (var img in images)
+    {
+        var imgSrc = img;
+        if (!string.IsNullOrEmpty(imgSrc) && !imgSrc.StartsWith("/"))
+        {
+            imgSrc = "/" + imgSrc;
+        }
+        if (string.IsNullOrEmpty(imgSrc))
+        {
+            imgSrc = "/Content/assets/images/photo-product-thumb-1.jpg";
+        }
+
+        <a class="item-gallery-sidebar wrap-pic-w" href="@imgSrc" data-lightbox="gallery-sidebar" title="@product.Title">
+            <img src="@imgSrc" alt="@product.Title" style="width: 100%; height: auto; display: block;" onerror="this.src='/Content/assets/images/photo-product-thumb-1.jpg';" />
+        </a>
+    }
+}

@@ -1,0 +1,112 @@
+﻿@model IEnumerable<WebTH.Models.ProductReportItem>
+@using System.Linq
+
+@{
+    ViewBag.Title = "Báo cáo Sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">📦 Báo cáo Sản phẩm</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng bán</th>
+                        <th>Tổng doanh thu</th>
+                        <th>Giá trung bình</th>
+                        <th>Hiệu suất</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var product in Model)
+                        {
+                            var performance = product.QuantitySold > 100 ? "Xuất sắc" : product.QuantitySold > 50 ? "Tốt" : "Trung bình";
+                            var badgeClass = performance == "Xuất sắc" ? "success" : performance == "Tốt" ? "info" : "warning";
+
+                            <tr>
+                                <td>@product.Product</td>
+                                <td>@product.QuantitySold đơn vị</td>
+                                <td>₫@product.TotalRevenue.ToString("N2")</td>
+                                <td>₫@product.AveragePrice.ToString("N2")</td>
+                                <td><span class="badge badge-@badgeClass">@performance</span></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding: 20px; color: #999;">Không có dữ liệu sản phẩm</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-6">
+                <div style="background: white; padding: 20px; border-radius: 8px;">
+                    <h4>Top 10 bán chạy</h4>
+                    <div id="bestSellersChart" style="height: 400px;"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div style="background: white; padding: 20px; border-radius: 8px;">
+                    <h4>Phân bố doanh thu</h4>
+                    <div id="revenueDistChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.0/apexcharts.min.js"></script>
+    <script>
+        // Convert Model data to JavaScript arrays
+        const products = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        
+        if (products && products.length > 0) {
+            const productNames = products.map(p => p.Product);
+            const quantities = products.map(p => p.QuantitySold);
+            const revenues = products.map(p => p.TotalRevenue);
+
+            // Best sellers chart
+            const bestSellersOptions = {
+                chart: { type: 'bar', height: 400 },
+                series: [{
+                    name: 'Số đơn vị bán',
+                    data: quantities
+                }],
+                xaxis: {
+                    categories: productNames
+                },
+                plotOptions: { bar: { horizontal: true } },
+                colors: ['#007bff']
+            };
+            new ApexCharts(document.querySelector('#bestSellersChart'), bestSellersOptions).render();
+
+            // Revenue distribution chart
+            const revenueDistOptions = {
+                chart: { type: 'pie', height: 400 },
+                series: revenues,
+                labels: productNames,
+                colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#adb5bd']
+            };
+            new ApexCharts(document.querySelector('#revenueDistChart'), revenueDistOptions).render();
+        }
+    </script>
+}

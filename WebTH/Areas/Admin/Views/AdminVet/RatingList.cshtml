@@ -1,0 +1,268 @@
+﻿@model IEnumerable<WebTH.Models.VetClinicRating>
+
+@{
+    ViewBag.Title = "Quản Lý Đánh Giá";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-star"></i> Quản Lý Đánh Giá Phòng Khám</h1>
+            <p class="text-muted">Phòng khám: <strong>@ViewBag.ClinicName</strong></p>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="btn-group" role="group">
+                <a href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId, filter = "all" })" 
+                   class="btn btn-sm @(ViewBag.Filter == "all" || ViewBag.Filter == "" ? "btn-primary active" : "btn-outline-primary")">
+                    <i class="fas fa-list"></i> Tất Cả (@(ViewBag.PendingCount + ViewBag.ApprovedCount))
+                </a>
+                <a href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId, filter = "pending" })" 
+                   class="btn btn-sm @(ViewBag.Filter == "pending" ? "btn-warning active" : "btn-outline-warning")">
+                    <i class="fas fa-clock"></i> Chờ Duyệt (@ViewBag.PendingCount)
+                </a>
+                <a href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId, filter = "approved" })" 
+                   class="btn btn-sm @(ViewBag.Filter == "approved" ? "btn-success active" : "btn-outline-success")">
+                    <i class="fas fa-check"></i> Đã Duyệt (@ViewBag.ApprovedCount)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ratings List -->
+    <div class="row">
+        @foreach (var rating in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 @(rating.IsApproved ? "border-success" : "border-warning")" style="border-left: 4px solid @(rating.IsApproved ? "#28a745" : "#ffc107");">
+                    <div class="card-header bg-light">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="mb-0">@rating.UserName</h6>
+                                <small class="text-muted">@rating.Email</small>
+                                @if (ViewBag.ClinicId == null && rating.VetClinic != null)
+                                {
+                                    <br />
+                                    <small class="text-primary">
+                                        <i class="fas fa-hospital-alt"></i> @rating.VetClinic.ClinicName
+                                    </small>
+                                }
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-star"></i> @(rating.Rating)/5
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Verification Badge -->
+                        @if (rating.IsVerified)
+                        {
+                            <span class="badge badge-success mb-2">
+                                <i class="fas fa-check-circle"></i> Đã Xác Minh
+                            </span>
+                        }
+
+                        <!-- Comment -->
+                        <p class="card-text">
+                            <strong>Bình Luận:</strong><br/>
+                            @if (!string.IsNullOrEmpty(rating.Comment))
+                            {
+                                @rating.Comment
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có bình luận</span>
+                            }
+                        </p>
+
+                        <!-- Detailed Ratings -->
+                        @if (rating.ServiceQuality.HasValue || rating.Professionalism.HasValue || rating.Facility.HasValue || rating.PriceValue.HasValue)
+                        {
+                            <div class="mt-3 pt-3 border-top">
+                                <p class="small mb-2"><strong>Chi Tiết Đánh Giá:</strong></p>
+                                @if (rating.ServiceQuality.HasValue)
+                                {
+                                    <p class="small mb-1">
+                                        <span>Chất Lượng Dịch Vụ:</span>
+                                        <span class="badge badge-info">@(rating.ServiceQuality)/5</span>
+                                    </p>
+                                }
+                                @if (rating.Professionalism.HasValue)
+                                {
+                                    <p class="small mb-1">
+                                        <span>Chuyên Nghiệp:</span>
+                                        <span class="badge badge-info">@(rating.Professionalism)/5</span>
+                                    </p>
+                                }
+                                @if (rating.Facility.HasValue)
+                                {
+                                    <p class="small mb-1">
+                                        <span>Cơ Sở Vật Chất:</span>
+                                        <span class="badge badge-info">@(rating.Facility)/5</span>
+                                    </p>
+                                }
+                                @if (rating.PriceValue.HasValue)
+                                {
+                                    <p class="small mb-0">
+                                        <span>Giá Trị:</span>
+                                        <span class="badge badge-info">@(rating.PriceValue)/5</span>
+                                    </p>
+                                }
+                            </div>
+                        }
+
+                        <!-- Dates -->
+                        @{
+                            var createdDateText = rating.CreatedDate.ToString("dd/MM/yyyy");
+                            var visitDateText = rating.VisitDate.HasValue
+                                ? rating.VisitDate.Value.ToString("dd/MM/yyyy")
+                                : string.Empty;
+                        }
+                        <p class="small text-muted mt-3 mb-0">
+                            <i class="fas fa-calendar"></i> Ngày Bình Luận: @createdDateText
+                            @if (rating.VisitDate.HasValue)
+                            {
+                                @:<br/>
+                                <text><i class="fas fa-clinic-medical"></i> Ngày Khám: @visitDateText</text>
+                            }
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-light">
+                        <a href="@Url.Action("EditRating", "AdminVet", new { Area = "Admin", id = rating.Id, clinicId = ViewBag.ClinicId, filter = ViewBag.Filter, page = ViewBag.CurrentPage })"
+                           class="btn btn-sm btn-primary mb-2" style="width: 100%;">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+
+                        @if (!rating.IsApproved)
+                        {
+                            <button class="btn btn-sm btn-success approve-rating-btn mb-2" data-rating-id="@rating.Id" style="width: 48%; margin-right: 2%;">
+                                <i class="fas fa-check"></i> Duyệt
+                            </button>
+                            <button class="btn btn-sm btn-danger reject-rating-btn mb-2" data-rating-id="@rating.Id" style="width: 48%;">
+                                <i class="fas fa-ban"></i> Từ Chối
+                            </button>
+                        }
+                        else
+                        {
+                            <span class="badge badge-success" style="display: block; padding: 0.5rem; text-align: center;">
+                                <i class="fas fa-check-circle"></i> Đã Được Phê Duyệt
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.Count() == 0)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Không có đánh giá nào để hiển thị.
+        </div>
+    }
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId, filter = ViewBag.Filter, page = ViewBag.CurrentPage - 1 })">
+                        Trước
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" 
+                           href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId, filter = ViewBag.Filter, page = i })">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId, filter = ViewBag.Filter, page = ViewBag.CurrentPage + 1 })">
+                        Tiếp
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay Lại
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Approve rating
+            $('.approve-rating-btn').click(function () {
+                var ratingId = $(this).data('rating-id');
+                if (confirm('Bạn có chắc chắn muốn phê duyệt đánh giá này?')) {
+                    $.post('@Url.Action("ApproveRating", "AdminVet", new { Area = "Admin" })', 
+                        { id: ratingId }, 
+                        function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                location.reload();
+                            }
+                        });
+                }
+            });
+
+            // Reject rating
+            $('.reject-rating-btn').click(function () {
+                var ratingId = $(this).data('rating-id');
+                if (confirm('Bạn có chắc chắn muốn từ chối đánh giá này?')) {
+                    $.post('@Url.Action("RejectRating", "AdminVet", new { Area = "Admin" })',
+                        { id: ratingId }, 
+                        function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                location.reload();
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-0.25rem);
+        box-shadow: 0 0.35rem 2.75rem rgba(0, 0, 0, 0.15);
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+</style>

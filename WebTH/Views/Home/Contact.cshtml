@@ -1,0 +1,259 @@
+﻿@{
+    ViewBag.Title = "Liên hệ với chúng tôi";
+}
+
+<style>
+    /* Contact Page Styles */
+    .contact-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+    }
+
+    .contact-banner h1 {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .contact-content {
+        padding: 60px 0;
+    }
+
+    .contact-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .contact-info {
+        padding: 30px;
+    }
+
+    .info-group {
+        margin-bottom: 40px;
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .info-content h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 8px;
+    }
+
+    .info-content p {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .info-content a {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .info-content a:hover {
+        color: #764ba2;
+    }
+
+    .contact-form {
+        background: #f9f9f9;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-form h3 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 40px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    @@media (max-width: 768px) {
+        .contact-wrapper {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-banner h1 {
+            font-size: 32px;
+        }
+    }
+</style>
+
+<section class="contact-banner">
+    <div class="container">
+        <h1>@ViewBag.Title</h1>
+        <p style="font-size: 18px; margin-top: 10px;">Chúng tôi luôn sẵn sàng giúp đỡ và trả lời mọi câu hỏi của bạn</p>
+    </div>
+</section>
+
+<section class="contact-content">
+    <div class="container">
+        <div class="contact-wrapper">
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <div class="info-group">
+                    <div class="info-icon">
+                        <i class="fa fa-map-marker"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Địa chỉ</h3>
+                        <p>
+                            123 Đường Trần Hưng Đạo<br />
+                            Quận 1, TP. Hồ Chí Minh<br />
+                            Việt Nam
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-group">
+                    <div class="info-icon">
+                        <i class="fa fa-phone"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Điện thoại</h3>
+                        <p>
+                            <a href="tel:+84909123456">+84 (90) 9123456</a><br />
+                            <a href="tel:+84284123456">+84 (28) 4123456</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-group">
+                    <div class="info-icon">
+                        <i class="fa fa-envelope"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Email</h3>
+                        <p>
+                            <a href="mailto:support@petfood.vn">support@petfood.vn</a><br />
+                            <a href="mailto:info@petfood.vn">info@petfood.vn</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-group">
+                    <div class="info-icon">
+                        <i class="fa fa-clock-o"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Giờ làm việc</h3>
+                        <p>
+                            Thứ Hai - Thứ Sáu: 8:00 - 17:00<br />
+                            Thứ Bảy: 8:00 - 12:00<br />
+                            Chủ Nhật: Đóng cửa
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h3>Gửi tin nhắn cho chúng tôi</h3>
+                <form>
+                    <div class="form-group">
+                        <label for="fullname">Họ và Tên</label>
+                        <input type="text" id="fullname" name="fullname" placeholder="Nhập họ và tên của bạn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Nhập địa chỉ email của bạn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại của bạn">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Tiêu đề</label>
+                        <input type="text" id="subject" name="subject" placeholder="Nhập tiêu đề tin nhắn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Tin nhắn</label>
+                        <textarea id="message" name="message" placeholder="Nhập nội dung tin nhắn của bạn" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Gửi tin nhắn</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

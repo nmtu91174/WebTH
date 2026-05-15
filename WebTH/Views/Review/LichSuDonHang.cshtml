@@ -1,0 +1,447 @@
+﻿@model IEnumerable<WebTH.Models.EF.Order>
+@using WebTH.Common
+
+<style>
+    /* Order History Styles */
+    .order-history-section {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        margin-top: 30px;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .order-history-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .order-history-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #333;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .order-history-header i {
+        color: #667eea;
+        font-size: 1.8rem;
+    }
+
+    .orders-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+
+    .orders-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .orders-table thead th {
+        padding: 16px 14px;
+        font-weight: 600;
+        text-align: left;
+        font-size: 0.9rem;
+        border: none;
+    }
+
+    .orders-table thead th:first-child {
+        border-radius: 12px 0 0 0;
+    }
+
+    .orders-table thead th:last-child {
+        border-radius: 0 12px 0 0;
+    }
+
+    .orders-table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.2s ease;
+    }
+
+    .orders-table tbody tr:hover {
+        background-color: #f8f9ff;
+    }
+
+    .orders-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .orders-table tbody td {
+        padding: 15px 14px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .order-stt {
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .order-code {
+        font-weight: 700;
+        color: #111827;
+        font-family: 'Courier New', monospace;
+    }
+
+    .order-date {
+        color: #4b5563;
+        white-space: nowrap;
+    }
+
+    .order-total {
+        font-weight: 700;
+        color: #0f766e;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+    }
+
+    .status-paid {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+    }
+
+    .status-shipping {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+
+    .status-completed {
+        background: linear-gradient(135deg, #e7e8ea 0%, #d8dade 100%);
+        color: #383d41;
+    }
+
+    .btn-order-detail {
+        border: 0;
+        color: #fff;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .btn-order-detail:hover,
+    .btn-order-detail:focus {
+        color: #fff;
+        opacity: 0.95;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+        outline: none;
+    }
+
+    .order-detail-loading {
+        padding: 25px 10px;
+        text-align: center;
+        color: #6366f1;
+        font-size: 15px;
+    }
+
+    .order-detail-loading i {
+        margin-right: 8px;
+    }
+
+    .order-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 8px;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+
+    .empty-state-title {
+        font-size: 1.3rem;
+        color: #999;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .empty-state-text {
+        color: #bbb;
+        margin-bottom: 30px;
+    }
+
+    .btn-start-shopping {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-start-shopping:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    @@media (max-width: 992px) {
+        .orders-table thead th,
+        .orders-table tbody td {
+            padding: 12px 10px;
+            font-size: 0.84rem;
+        }
+
+        .btn-order-detail {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .order-history-section {
+            padding: 24px;
+        }
+
+        .order-history-header h2 {
+            font-size: 1.2rem;
+        }
+
+        .status-badge {
+            padding: 6px 10px;
+            font-size: 0.75rem;
+        }
+
+        .order-summary {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+@if (Model != null && Model.Any())
+{
+    var orderStats = new
+    {
+        Total = Model.Count(),
+        Pending = Model.Count(x => x.Status == 1),
+        Paid = Model.Count(x => x.Status == 2),
+        Shipping = Model.Count(x => x.Status == 3),
+        Completed = Model.Count(x => x.Status == 4)
+    };
+
+    var i = 1;
+
+    <div class="order-history-section">
+        <div class="order-history-header">
+            <h2>
+                <i class="fa fa-history"></i>
+                Lịch sử mua hàng
+            </h2>
+        </div>
+
+        <div class="orders-table-wrapper">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã đơn hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái đơn</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var statusClass = "status-completed";
+                        var statusIcon = "fa-check-square";
+                        var statusText = "Hoàn thành";
+
+                        if (item.Status == 1)
+                        {
+                            statusClass = "status-pending";
+                            statusIcon = "fa-clock-o";
+                            statusText = "Chờ thanh toán";
+                        }
+                        else if (item.Status == 2)
+                        {
+                            statusClass = "status-paid";
+                            statusIcon = "fa-check-circle";
+                            statusText = "Đã thanh toán";
+                        }
+                        else if (item.Status == 3)
+                        {
+                            statusClass = "status-shipping";
+                            statusIcon = "fa-truck";
+                            statusText = "Đang giao hàng";
+                        }
+
+                        <tr>
+                            <td class="order-stt">#@i</td>
+                            <td class="order-code">@item.Code</td>
+                            <td class="order-date">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="order-total">@Common.FormatNumber(item.TotalAmount, 0)đ</td>
+                            <td>
+                                <span class="status-badge @statusClass">
+                                    <i class="fa @statusIcon"></i>
+                                    <span>@statusText</span>
+                                </span>
+                            </td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-order-detail js-order-detail"
+                                        data-order-id="@item.Id"
+                                        data-order-code="@item.Code">
+                                    <i class="fa fa-eye"></i> Xem chi tiết
+                                </button>
+                            </td>
+                        </tr>
+
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="order-summary">
+            <div class="stat-card">
+                <div class="stat-number">@orderStats.Total</div>
+                <div class="stat-label">Tổng đơn hàng</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@orderStats.Pending</div>
+                <div class="stat-label">Chờ thanh toán</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@orderStats.Shipping</div>
+                <div class="stat-label">Đang giao hàng</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@orderStats.Completed</div>
+                <div class="stat-label">Hoàn thành</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="order-history-section">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa fa-shopping-bag"></i>
+            </div>
+            <div class="empty-state-title">Chưa có đơn hàng</div>
+            <div class="empty-state-text">Bạn chưa thực hiện bất kỳ đơn hàng nào. Hãy bắt đầu mua sắm ngay!</div>
+            <a href="/" class="btn-start-shopping">
+                <i class="fa fa-shopping-cart"></i>
+                <span>Bắt đầu mua sắm</span>
+            </a>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="orderDetailModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff; opacity: 1;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="orderDetailLabel">
+                    <i class="fa fa-file-text-o"></i> Chi tiết đơn hàng
+                </h4>
+            </div>
+            <div class="modal-body" id="orderDetailBody">
+                <div class="order-detail-loading">
+                    <i class="fa fa-spinner fa-spin"></i> Đang tải chi tiết đơn hàng...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function () {
+        $(document).off('click.orderDetail', '.js-order-detail').on('click.orderDetail', '.js-order-detail', function () {
+            var orderId = $(this).data('order-id');
+            var orderCode = $(this).data('order-code');
+            var $modal = $('#orderDetailModal');
+            var $body = $('#orderDetailBody');
+
+            $('#orderDetailLabel').html('<i class="fa fa-file-text-o"></i> Chi tiết đơn hàng ' + orderCode);
+            $body.html('<div class="order-detail-loading"><i class="fa fa-spinner fa-spin"></i> Đang tải chi tiết đơn hàng...</div>');
+            $modal.modal('show');
+
+            $.get('/Review/OrderDetail', { id: orderId })
+                .done(function (html) {
+                    $body.html(html);
+                })
+                .fail(function () {
+                    $body.html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> Không thể tải chi tiết đơn hàng. Vui lòng thử lại.</div>');
+                });
+        });
+    })();
+</script>

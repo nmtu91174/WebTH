@@ -1,0 +1,241 @@
+**mô tả LUỒNG MODULE SHIPPER**
+# I. TỔNG QUAN MODULE SHIPPER (BIG PICTURE)
+Module **Shipper** chịu trách nhiệm **xử lý vòng đời vật lý của đơn hàng** sau khi đơn đã được tạo và duyệt.
+Luồng chuẩn:
+```
+Customer tạo order
+→ Admin duyệt
+→ Assign shipper
+→ Shipper nhận đơn
+→ Shipper lấy hàng
+→ Shipper giao hàng
+→ (Success | Failed)
+→ Lock order
+```
+Mỗi bước:
+* thay đổi `orders.status`
+* ghi `order_history`
+* có thể có ảnh proof
+* có thể bị rollback nếu sai workflow
+---
+# II. CÁC STATUS CHUẨN (THEO DB)
+| ID | Code | Ý nghĩa |
+| -- | --------- | ----------------- |
+| 1 | booked | Đã tạo đơn |
+| 2 | approved | Agent/Admin duyệt |
+| 3 | assigned | Shipper nhận đơn |
+| 4 | picked_up | Đã lấy hàng |
+| 5 | delivered | Giao thành công |
+| 6 | failed | Giao thất bại |
+| 7 | cancelled | Hủy |
+📌 **Shipper chỉ thao tác từ status 3 → 6**
+---
+# III. LUỒNG CHI TIẾT TỪ ĐẦU ĐẾN CUỐI
+---
+## 🔵 1. TẠO ORDER (BOOKED – status = 1)
+### Ai làm?
+* Customer
+* Admin
+### DB thay đổi
+**orders**
+```sql
+status = 1
+shipper_id = NULL
+```
+**order_history**
+```text
+status_id = 1
+role = customer
+note = "Đặt hàng thành công"
+```
+📌 **Shipper chưa thấy đơn**
+---
+## 🟡 2. DUYỆT ORDER (APPROVED – status = 2)
+### Ai làm?
+* Admin
+### DB
+```sql
+orders.status = 2
+orders.agent_id = X
+```
+**order_history**
+```text
+status_id = 2
+role = admin
+note = "Đã duyệt đơn"
+```
+📌 **Sẵn sàng assign shipper**
+---
+## 🟠 3. ASSIGN SHIPPER (status vẫn = 2)
+### Ai làm?
+* Admin
+### DB
+```sql
+orders.shipper_id =
+```
+**order_history**
+```text
+status_id = 2
+role = system
+note = "Phân công shipper"
+```
+📌 **Shipper thấy đơn trong Dashboard**
+---
+## 🔵 4. SHIPPER NHẬN ĐƠN (ASSIGNED – status = 3)
+### Action
+👉 Shipper bấm **"Nhận đơn"**
+### Backend check
+* order.status == 2
+* order.shipper_id == current shipper
+* order.is_locked = 0
+### DB
+```sql
+orders.status = 3
+```
+**order_history**
+```text
+status_id = 3
+role = shipper
+note = "Shipper accepted assignment"
+```
+📌 **Bắt đầu workflow vật lý**
+---
+## 🔵 5. SHIPPER LẤY HÀNG (PICKED UP – status = 4)
+### Action
+👉 Shipper tới điểm gửi → bấm **"Đã lấy hàng"**
+### Bắt buộc
+* chụp ảnh pickup
+* có thể gửi GPS
+### DB
+**orders**
+```sql
+status = 4
+pickup_proof = '/uploads/...jpg'
+```
+**order_images**
+```text
+type = pickup
+```
+**order_history**
+```text
+status_id = 4
+note = "Shipper xác nhận đã lấy hàng"
+```
+📌 **Từ đây trở đi: chỉ có 2 đường**
+* Giao thành công
+* Giao thất bại
+---
+## 🟢 6A. GIAO HÀNG THÀNH CÔNG (DELIVERED – status = 5)
+### Action
+👉 Shipper giao hàng → chụp ảnh → xác nhận
+### Backend check
+* order.status == 4
+* order.is_locked = 0
+### DB
+**orders**
+```sql
+previous_status = 4
+status = 5
+delivered_at = NOW()
+is_locked = 1
+delivery_proof = '/uploads/...jpg'
+delivery_lat / lng / accuracy
+```
+**order_images**
+```text
+type = delivery
+```
+**order_history**
+```text
+status_id = 5
+note = "Shipper xác nhận đã giao hàng"
+```
+📌 **Order kết thúc – không rollback**
+---
+## 🔴 6B. GIAO HÀNG THẤT BẠI (FAILED – status = 6)
+### Khi nào?
+* Không liên hệ được khách
+* Khách từ chối
+* Hàng hỏng
+* Thời tiết
+* Lý do khác
+### Action
+👉 Shipper bấm **"Giao thất bại"**
+👉 Mở **Modal Delivery Failed**
+---
+### Bắt buộc nhập
+* reason (ENUM)
+* note
+* ảnh proof
+* GPS (optional)
+---
+### DB TRANSACTION (RẤT QUAN TRỌNG)
+#### 1️⃣ delivery_issues
+```sql
+issue_type = reason
+description = note
+is_final = 1
+```
+#### 2️⃣ orders
+```sql
+previous_status = 4
+status = 6
+failed_at = NOW()
+failed_by = shipper_id
+failed_issue_id = delivery_issues.id
+failed_reason = reason
+is_locked = 1
+```
+#### 3️⃣ order_images
+```text
+type = delivery_failed
+```
+#### 4️⃣ order_history
+```text
+status_id = 6
+note = note
+```
+📌 **Order kết thúc – cần Admin xử lý tiếp**
+---
+# IV. NHỮNG NGUYÊN TẮC VÀNG CỦA MODULE SHIPPER
+## 🔐 1. LOCK ORDER
+| Khi | is_locked |
+| --------- | --------- |
+| delivered | 1 |
+| failed | 1 |
+→ Không cho sửa lại
+---
+## 🚫 2. KHÔNG NHẢY STATUS
+❌ Không được:
+* 3 → 5
+* 4 → 3
+* 5 → 6
+---
+## 🧾 3. MỌI HÀNH ĐỘNG ĐỀU CÓ LỊCH SỬ
+Không có:
+```sql
+order_history
+```
+→ Workflow **SAI**
+---
+## 🖼️ 4. ẢNH LÀ BẰNG CHỨNG PHÁP LÝ
+| Loại | Bắt buộc |
+| --------------- | -------- |
+| pickup | ✔ |
+| delivery | ✔ |
+| delivery_failed | ✔ |
+---
+# V. FRONTEND UI THEO WORKFLOW
+| Status | UI |
+| ------ | ------------------------------------------ |
+| 2 | Button "Nhận đơn" |
+| 3 | Button "Đã lấy hàng" |
+| 4 | Button "Giao thành công" + "Giao thất bại" |
+| 5 | Read-only |
+| 6 | Read-only + Alert đỏ |
+---
+# VI. SAU MODULE SHIPPER LÀ GÌ?
+* Admin xử lý order failed
+* Re-assign / cancel / refund
+* Analytics: fail rate / shipper performance
+---

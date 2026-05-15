@@ -1,0 +1,99 @@
+﻿@model IEnumerable<WebTH.Models.CustomerReportItem>
+@using System.Linq
+@{
+    ViewBag.Title = "Báo cáo Khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">👥 Báo cáo Khách hàng</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tên Khách hàng</th>
+                        <th>Tổng Đơn hàng</th>
+                        <th>Tổng Chi tiêu</th>
+                        <th>Đơn hàng Đầu tiên</th>
+                        <th>Đơn hàng Cuối cùng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var customer in Model)
+                        {
+                            <tr>
+                                <td>@customer.Customer</td>
+                                <td>@customer.OrderCount</td>
+                                <td>$@customer.TotalSpent.ToString("N2")</td>
+                                <td>@customer.FirstOrder.ToString("yyyy-MM-dd")</td>
+                                <td>@customer.LastOrder.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (customer.OrderCount > 5)
+                                    {
+                                        <span class="badge badge-success">VIP</span>
+                                    }
+                                    else if (customer.OrderCount > 1)
+                                    {
+                                        <span class="badge badge-info">Quay lại</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">Mới</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 20px; color: #999;">Không có dữ liệu khách hàng</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <h4>Phân bố Khách hàng</h4>
+            <div id="customerSegmentChart" style="height: 400px;"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.0/apexcharts.min.js"></script>
+    <script>
+        // Convert Model data to JavaScript array
+        const customers = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        
+        if (customers && customers.length > 0) {
+            // Segment customers
+            const newCustomers = customers.filter(c => c.OrderCount === 1).length;
+            const returningCustomers = customers.filter(c => c.OrderCount > 1 && c.OrderCount <= 5).length;
+            const vipCustomers = customers.filter(c => c.OrderCount > 5).length;
+
+            // Create customer segment chart
+            const segmentOptions = {
+                chart: { type: 'pie', height: 400 },
+                series: [newCustomers, returningCustomers, vipCustomers],
+                labels: ['Khách hàng Mới', 'Khách hàng Quay lại', 'Khách hàng VIP'],
+                colors: ['#17a2b8', '#0056b3', '#FFD700']
+            };
+            new ApexCharts(document.querySelector('#customerSegmentChart'), segmentOptions).render();
+        }
+    </script>
+}

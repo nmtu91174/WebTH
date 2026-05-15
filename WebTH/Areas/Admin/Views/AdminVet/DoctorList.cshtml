@@ -1,0 +1,182 @@
+﻿@model IEnumerable<WebTH.Models.VetDoctor>
+
+@{
+    ViewBag.Title = "Quản Lý Bác Sĩ";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-user-md"></i> Quản Lý Bác Sĩ</h1>
+                <p class="text-muted">Phòng khám: <strong>@ViewBag.ClinicName</strong></p>
+            </div>
+            <div>
+                <a href="@Url.Action("CreateDoctor", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId })" 
+                   class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm Bác Sĩ
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor List -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Danh Sách Bác Sĩ</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên Bác Sĩ</th>
+                        <th>Chuyên Môn</th>
+                        <th>Kinh Nghiệm</th>
+                        <th>Bằng Cấp</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var doctor in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@doctor.DoctorName</strong>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(doctor.Specialization))
+                                {
+                                    <span class="badge badge-info">@doctor.Specialization</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (doctor.ExperienceYears.HasValue)
+                                {
+                                    <span>@doctor.ExperienceYears năm</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(doctor.Qualifications))
+                                {
+                                    <small>@doctor.Qualifications.Substring(0, Math.Min(30, doctor.Qualifications.Length))...</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (doctor.IsActive)
+                                {
+                                    <span class="badge badge-success"><i class="fas fa-check"></i> Hoạt Động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary"><i class="fas fa-ban"></i> Vô Hiệu</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="@Url.Action("EditDoctor", "AdminVet", new { Area = "Admin", id = doctor.Id })" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <button class="btn btn-sm btn-danger delete-btn" data-doctor-id="@doctor.Id" 
+                                        data-clinic-id="@ViewBag.ClinicId">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Count() == 0)
+        {
+            <div class="alert alert-info m-0">
+                <i class="fas fa-info-circle"></i> Chưa có bác sĩ nào. 
+                <a href="@Url.Action("CreateDoctor", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ClinicId })">Thêm bác sĩ mới</a>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("DoctorList", "AdminVet", new { Area = "Admin", id = ViewBag.ClinicId, page = ViewBag.CurrentPage - 1 })">
+                        Trước
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" 
+                           href="@Url.Action("DoctorList", "AdminVet", new { Area = "Admin", id = ViewBag.ClinicId, page = i })">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("DoctorList", "AdminVet", new { Area = "Admin", id = ViewBag.ClinicId, page = ViewBag.CurrentPage + 1 })">
+                        Tiếp
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay Lại
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Delete doctor
+            $('.delete-btn').click(function () {
+                var doctorId = $(this).data('doctor-id');
+                var clinicId = $(this).data('clinic-id');
+                if (confirm('Bạn có chắc chắn muốn xóa bác sĩ này?')) {
+                    $.post('@Url.Action("DeleteDoctor", "AdminVet", new { Area = "Admin" })', 
+                        { id: doctorId }, 
+                        function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                location.reload();
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+    }
+</style>

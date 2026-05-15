@@ -1,0 +1,3259 @@
+﻿@model WebTH.Models.EF.Product
+@{
+    ViewBag.Title = "Detail";
+}
+
+<style>
+    /* ===== Product Detail Improvements ===== */
+
+    /* Breadcrumb Styling */
+    .bg-title-page {
+        position: relative;
+        overflow: hidden;
+    }
+
+        .bg-title-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+        }
+
+    .tit6 {
+        position: relative;
+        z-index: 2;
+        font-size: 29px;
+        font-weight: 900;
+        color: white;
+        letter-spacing: 1px;
+        animation: titleSlideDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin: 0;
+    }
+
+    @@keyframes titleSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Breadcrumb */
+    .bread-crumb {
+        background: white;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        border-bottom: 2px solid #f5f5f5;
+    }
+
+        .bread-crumb a {
+            color: #fe4c50;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .bread-crumb a:hover {
+                color: #ff6c70;
+                text-decoration: underline;
+            }
+
+            .bread-crumb a i {
+                margin-right: 6px;
+                transition: transform 0.3s ease;
+            }
+
+            .bread-crumb a:hover i {
+                transform: scale(1.15);
+            }
+
+        .bread-crumb .txt29 {
+            color: #ddd;
+            transition: color 0.3s ease;
+        }
+
+    /* Product Detail Container */
+    .product-detail-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: flex-start;
+    }
+
+        /* Product gallery wrapper */
+        .product-detail-wrapper > div:first-child {
+            display: flex;
+            flex-direction: column;
+        }
+
+    /* Smooth Scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Container Enhancements */
+    .container {
+        max-width: 1260px;
+        padding: 0 20px;
+    }
+
+    /* Section Spacing */
+    section {
+        background: white;
+    }
+
+    /* Global Button Hover Effects */
+    button, a[class*="btn"], a[role="button"] {
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Product Image Loading State */
+    .product-main-image img[src=""],
+    .product-main-image img:not([complete]) {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 2s infinite;
+    }
+
+    @@keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    /* Smooth Color Transitions */
+    * {
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* Focus States for Accessibility */
+    input:focus,
+    button:focus,
+    textarea:focus,
+    select:focus {
+        outline: 2px solid #fe4c50;
+        outline-offset: 2px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #fe4c50 0%, #ff6c70 100%);
+        border-radius: 10px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ff6c70 0%, #ff8c90 100%);
+        }
+
+    /* Text Selection */
+    ::selection {
+        background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        color: white;
+    }
+
+    .product-gallery {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+        .product-gallery:hover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+    .product-main-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 550px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+        background-attachment: fixed;
+    }
+
+        .product-main-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(254, 76, 80, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .product-main-image img {
+            max-width: 100%;
+            max-height: 550px;
+            object-fit: contain;
+            cursor: zoom-in;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            opacity: 1;
+            animation: fadeInImage 0.6s ease-in-out;
+        }
+
+    @@keyframes fadeInImage {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .product-main-image img:hover {
+        transform: scale(1.1);
+        filter: brightness(1.03);
+    }
+
+    .zoom-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-in;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(254, 76, 80, 0.3);
+        font-size: 20px;
+    }
+
+    .product-main-image:hover .zoom-icon {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .zoom-icon:hover {
+        transform: scale(1.2);
+        box-shadow: 0 8px 25px rgba(254, 76, 80, 0.5);
+    }
+
+    .product-thumbnails {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        padding: 15px;
+        background: #fafafa;
+        border-top: 1px solid #f0f0f0;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .thumbnail-item {
+        width: 90px;
+        height: 90px;
+        border: 3px solid transparent;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        position: relative;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+        .thumbnail-item:hover {
+            border-color: #fe4c50;
+            transform: scale(1.12) translateY(-5px);
+            box-shadow: 0 8px 20px rgba(254, 76, 80, 0.3);
+        }
+
+        .thumbnail-item.active {
+            border-color: #fe4c50;
+            background: #fff5f5;
+            box-shadow: 0 6px 20px rgba(254, 76, 80, 0.25);
+            transform: scale(1.08);
+        }
+
+        .thumbnail-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .thumbnail-item:hover img {
+            transform: scale(1.05);
+        }
+
+    /* Product Info Section */
+    .product-info-section {
+        padding: 45px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+        border: 1px solid #f5f5f5;
+        height: 100%;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .product-info-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fe4c50 0%, #ff6c70 50%, transparent 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .product-info-section:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+    .product-title-large {
+        font-size: 24px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+        margin-top: 0;
+        line-height: 1.4;
+        letter-spacing: -0.5px;
+        word-spacing: 0.5px;
+    }
+
+    .product-sku {
+        display: inline-block;
+        background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        color: #666;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-bottom: 14px;
+        margin-top: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+        .product-sku:hover {
+            background: linear-gradient(135deg, #e8e8e8 0%, #ddd 100%);
+            transform: translateX(2px);
+        }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding: 14px 0;
+        border-bottom: 2px solid #f5f5f5;
+        border-top: 2px solid #f5f5f5;
+    }
+
+    .rating-stars {
+        color: #ffc107;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .rating-stars i {
+            transition: all 0.3s ease;
+        }
+
+            .rating-stars i:hover {
+                transform: scale(1.15);
+                text-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
+            }
+
+    .rating-count {
+        color: #999;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .review-link {
+        color: #fe4c50;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .review-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #fe4c50;
+            transition: width 0.3s ease;
+        }
+
+        .review-link:hover {
+            color: #ff6c70;
+        }
+
+            .review-link:hover::after {
+                width: 100%;
+            }
+
+    /* Price Section */
+    .product-price-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 18px 0;
+        border-bottom: 2px solid #f5f5f5;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .price-wrapper {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+    }
+
+    .price-current {
+        font-size: 38px !important;
+        font-weight: 900;
+        background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -1px;
+        animation: priceEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @@keyframes priceEntry {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .price-original {
+        font-size: 16px;
+        color: #bbb;
+        text-decoration: line-through;
+        font-weight: 600;
+    }
+
+    .price-discount-badge {
+        background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 800;
+        animation: badgePulse 2.5s ease-in-out infinite;
+        box-shadow: 0 4px 15px rgba(254, 76, 80, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @@keyframes badgePulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.08);
+        }
+    }
+
+    .stock-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 10px 0;
+    }
+
+        .stock-indicator.in-stock {
+            color: #27ae60;
+        }
+
+            .stock-indicator.in-stock .stock-dot {
+                background: #27ae60;
+                animation: stockPulse 2s ease-in-out infinite;
+            }
+
+    @@keyframes stockPulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .stock-indicator.low-stock {
+        color: #f39c12;
+    }
+
+        .stock-indicator.low-stock .stock-dot {
+            background: #f39c12;
+        }
+
+    .stock-indicator.out-of-stock {
+        color: #e74c3c;
+    }
+
+        .stock-indicator.out-of-stock .stock-dot {
+            background: #e74c3c;
+        }
+
+    .stock-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px currentColor;
+    }
+
+    .view-count {
+        font-size: 13px;
+        color: #999;
+        margin-top: 15px;
+        padding: 10px 0;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .view-count i {
+            color: #fe4c50;
+            font-size: 16px;
+        }
+
+        .view-count strong {
+            color: #fe4c50;
+            font-weight: 700;
+        }
+
+    /* Quantity Selector */
+    .quantity-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 18px 0;
+        border-bottom: 2px solid #f5f5f5;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .quantity-label {
+        font-size: 13px;
+        font-weight: 800;
+        color: #1a1a1a;
+        min-width: 80px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .quantity_selector {
+        min-width: 150px;
+        display: flex;
+        align-items: center;
+        border: 2px solid #e8e8e8;
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);      
+    }
+
+        .quantity_selector:hover {
+            border-color: #fe4c50;
+            box-shadow: 0 8px 20px rgba(254, 76, 80, 0.2);
+        }
+
+        .quantity_selector span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            font-size: 14px;
+        }
+
+        .quantity_selector .minus,
+        .quantity_selector .plus {
+            background: #f8f8f8;
+            color: #666;
+            font-weight: 700;
+        }
+
+            .quantity_selector .minus:hover,
+            .quantity_selector .plus:hover {
+                background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+                color: white;
+                transform: scale(1.15);
+            }
+
+    #quantity_value {
+        min-width: 70px;
+        text-align: center;
+        font-weight: 800;
+        border-right: 1px solid #e8e8e8;
+        border-left: 1px solid #e8e8e8;
+        background: white;
+        cursor: default;
+        font-size: 18px;
+        color: #1a1a1a;
+        transition: all 0.3s ease;
+    }
+
+        #quantity_value:hover {
+            background: #f9f9f9;
+        }
+
+    /* Add to Cart Button */
+    .add_to_cart_button {
+        padding: 0;
+        margin: 20px 0;
+        width: 100%;
+    }
+
+        .add_to_cart_button a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+            color: white;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(254, 76, 80, 0.4);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .add_to_cart_button a::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+                transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                z-index: 1;
+            }
+
+            .add_to_cart_button a::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                z-index: 0;
+            }
+
+            .add_to_cart_button a:hover::before {
+                left: 100%;
+            }
+
+            .add_to_cart_button a:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 16px 45px rgba(254, 76, 80, 0.5);
+                background: linear-gradient(135deg, #ff6c70 0%, #ff8c90 100%);
+            }
+
+            .add_to_cart_button a:active {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(254, 76, 80, 0.4);
+            }
+
+            .add_to_cart_button a i {
+                font-size: 20px;
+                position: relative;
+                z-index: 2;
+                transition: all 0.4s ease;
+            }
+
+            .add_to_cart_button a:hover i {
+                transform: scale(1.2) rotate(8deg);
+            }
+
+    /* Wishlist & Share Buttons */
+    .product-actions {
+        display: flex;
+        gap: 14px;
+        padding: 20px 0;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .action-button {
+        flex: 1;
+        min-width: 120px;
+        padding: 12px 14px;
+        border: 2px solid #e8e8e8;
+        background: white;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.28s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #fe4c50;
+            z-index: -1;
+            transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .action-button:hover {
+            border-color: #fe4c50;
+            color: #fe4c50;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(254, 76, 80, 0.15);
+        }
+
+            .action-button:hover::before {
+                left: 0;
+            }
+
+        .action-button.active {
+            border-color: #fe4c50;
+            background: #fe4c50;
+            color: white;
+            box-shadow: 0 8px 20px rgba(254, 76, 80, 0.3);
+        }
+
+            .action-button.active i {
+                animation: heartBeat 0.6s ease;
+            }
+
+    @@keyframes heartBeat {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        25% {
+            transform: scale(1.3);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
+    .action-button i {
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .action-button:hover i {
+        transform: scale(1.1);
+    }
+
+    /* Product Attributes */
+    .product-attributes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        padding: 24px 0;
+        margin: 30px 0 30px;
+        background: linear-gradient(135deg, transparent 0%, rgba(254, 76, 80, 0.01) 100%);
+        border-top: 2px solid #f5f5f5;
+        border-bottom: 2px solid #f5f5f5;
+    }
+
+    .attribute-item {
+        display: flex;
+        flex-direction: column;
+        padding: 26px;
+        background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+        border-radius: 14px;
+        border-left: 5px solid #fe4c50;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .attribute-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 40px 40px 0;
+            border-color: transparent rgba(254, 76, 80, 0.08) transparent transparent;
+            transition: all 0.4s ease;
+        }
+
+        .attribute-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            border-left-color: #ff6c70;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+        }
+
+            .attribute-item:hover::before {
+                border-color: transparent rgba(254, 76, 80, 0.15) transparent transparent;
+            }
+
+    .attribute-label {
+        font-size: 11px;
+        font-weight: 900;
+        color: #fe4c50;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        letter-spacing: 1.5px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .attribute-value {
+        font-size: 14px;
+        color: #1a1a1a;
+        font-weight: 700;
+        line-height: 1.6;
+        word-break: break-word;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Product Tabs */
+    .product-tabs {
+        margin-top: 30px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+        border: 1px solid #f5f5f5;
+    }
+
+    .tab-nav {
+        display: flex;
+        border-bottom: 3px solid #f0f0f0;
+        background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+        padding: 0;
+        position: relative;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+        .tab-nav button {
+            padding: 22px 32px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 800;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            flex: 1;
+            text-align: center;
+        }
+
+            .tab-nav button:hover {
+                color: #fe4c50;
+                background: rgba(254, 76, 80, 0.02);
+            }
+
+            .tab-nav button.active {
+                color: #fe4c50;
+            }
+
+                .tab-nav button.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -3px;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
+                    background: linear-gradient(90deg, #fe4c50 0%, #ff6c70 100%);
+                    animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                }
+
+    @@keyframes slideIn {
+        from {
+            width: 0;
+        }
+
+        to {
+            width: 100%;
+        }
+    }
+
+    .tab-content {
+        display: none;
+        padding: 45px;
+        animation: fadeInTab 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        line-height: 1.9;
+        color: #555;
+        font-size: 14px;
+    }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3,
+        .tab-content h4 {
+            color: #1a1a1a;
+            margin-top: 28px;
+            margin-bottom: 14px;
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+            .tab-content h3:first-child,
+            .tab-content h4:first-child {
+                margin-top: 0;
+            }
+
+        .tab-content p {
+            margin-bottom: 16px;
+        }
+
+        .tab-content ul,
+        .tab-content ol {
+            margin-left: 24px;
+            margin-bottom: 18px;
+        }
+
+        .tab-content li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+            .tab-content li::marker {
+                color: #fe4c50;
+                font-weight: 700;
+            }
+
+    @@keyframes fadeInTab {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Trust Badges */
+    .trust-badges {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        border-radius: 12px;
+        margin: 18px 0;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .trust-badges::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fe4c50 0%, #ff6c70 50%, transparent 100%);
+        }
+
+    .badge-item {
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        flex: 1;
+        min-width: 120px;
+        transition: all 0.3s ease;
+    }
+
+        .badge-item:hover {
+            transform: translateY(-4px);
+        }
+
+    .badge-icon {
+        color: #fe4c50;
+        margin-bottom: 10px;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        text-shadow: 0 4px 12px rgba(254, 76, 80, 0.2);
+    }
+
+    .badge-item:hover .badge-icon {
+        transform: scale(1.2) rotate(8deg);
+        text-shadow: 0 6px 16px rgba(254, 76, 80, 0.3);
+    }
+
+    .search-sidebar2 {
+        background: white;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+        border-radius: 12px;
+        border: 1px solid #f5f5f5;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+        .search-sidebar2:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            border-color: #fe4c50;
+        }
+
+    .input-search-sidebar2 {
+        border: none !important;
+        outline: none !important;
+        font-size: 15px;
+        font-weight: 500;
+        color: #666 !important;
+        background: white !important;
+        transition: all 0.3s ease;
+    }
+
+        .input-search-sidebar2::placeholder {
+            color: #999;
+        }
+
+        .input-search-sidebar2:focus {
+            background: #fafafa !important;
+        }
+
+    .btn-search-sidebar2 {
+        background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+    }
+
+        .btn-search-sidebar2:hover {
+            background: linear-gradient(135deg, #ff6c70 0%, #ff8c90 100%);
+            transform: scale(1.1);
+        }
+
+    /* Reviews Section */
+    .popular {
+        margin-top: 35px;
+    }
+
+    .rating-entry {
+        padding: 22px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        border-radius: 12px;
+        margin-bottom: 18px;
+        border-left: 4px solid #fe4c50;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        position: relative;
+    }
+
+        .rating-entry:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            transform: translateX(6px);
+            border-left-color: #ff6c70;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+        }
+
+        .rating-entry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 4px;
+            background: #fe4c50;
+            border-radius: 50%;
+            animation: ratingPulse 2s ease-in-out infinite;
+        }
+
+    @@keyframes ratingPulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    /* Related Products */
+    .related-products {
+        padding: 70px 0;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        margin-top: 60px;
+        border-radius: 15px;
+    }
+
+        .related-products .tit3 {
+            margin-bottom: 50px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+
+    .item-gallery {
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .item-gallery:hover {
+            transform: translateY(-10px);
+        }
+
+    /* Star Rating */
+    .user_star_rating {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+        .user_star_rating li {
+            display: inline-block;
+            cursor: pointer;
+            list-style: none;
+        }
+
+            .user_star_rating li i {
+                color: #f5c136;
+                font-size: 20px;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                text-shadow: 0 2px 6px rgba(245, 193, 54, 0.3);
+                display: block;
+            }
+
+            .user_star_rating li:hover i {
+                color: #ffc107;
+                transform: scale(1.2) rotate(15deg);
+                text-shadow: 0 4px 12px rgba(245, 193, 54, 0.5);
+            }
+
+    /* Specifications Table */
+    .specifications-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+        .specifications-table thead {
+            background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        }
+
+        .specifications-table th {
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .specifications-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .specifications-table tbody tr:hover {
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+
+        .specifications-table .spec-label {
+            font-weight: 700;
+            color: #1a1a1a;
+            min-width: 150px;
+            width: 30%;
+        }
+
+        .specifications-table .spec-value {
+            color: #666;
+        }
+
+    /* Questions & Answers Section */
+    .qa-section {
+        margin-top: 40px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        border-radius: 12px;
+        border-left: 5px solid #fe4c50;
+    }
+
+    .qa-header {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .qa-header i {
+            color: #fe4c50;
+            font-size: 20px;
+        }
+
+    .qa-item {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e8e8e8;
+        transition: all 0.3s ease;
+    }
+
+        .qa-item:hover {
+            padding-left: 10px;
+            border-left: 3px solid #fe4c50;
+            border-bottom: 1px solid #e8e8e8;
+            margin-left: -10px;
+            padding-left: 20px;
+        }
+
+    .qa-question {
+        font-weight: 700;
+        color: #1a1a1a;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .qa-question:hover {
+            color: #fe4c50;
+        }
+
+    .qa-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: #fe4c50;
+        color: white;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+
+    .qa-item.open .qa-toggle {
+        transform: rotate(45deg);
+    }
+
+    .qa-answer {
+        display: none;
+        color: #666;
+        margin-top: 12px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        border-left: 3px solid #fe4c50;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .qa-item.open .qa-answer {
+        display: block;
+        animation: slideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .ask-question-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+        .ask-question-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(254, 76, 80, 0.3);
+        }
+
+    /* Video Section */
+    .product-video-section {
+        margin: 40px 0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: black;
+    }
+
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+    }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+    /* Product Metrics */
+    .product-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin: 24px 0 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        border-radius: 12px;
+        border: 1px solid #f0f0f0;
+    }
+
+    .metric-item {
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+        .metric-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(254, 76, 80, 0.15);
+        }
+
+    .metric-value {
+        font-size: 22px;
+        font-weight: 900;
+        color: #fe4c50;
+        display: block;
+    }
+
+    .metric-label {
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        margin-top: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .product-title-large {
+            font-size: 26px;
+        }
+
+        .price-current {
+            font-size: 32px;
+        }
+
+        .product-detail-wrapper {
+            gap: 30px;
+        }
+
+        .related-grid {
+            margin-left: 70px;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 18px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .product-info-section {
+            padding: 35px 30px;
+        }
+
+        .product-title-large {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .price-current {
+            font-size: 28px;
+        }
+
+        .product-attributes {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .product-detail-wrapper {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .related-grid {
+            margin-left: 70px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 16px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .product-gallery {
+            margin-bottom: 35px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .product-main-image {
+            min-height: 400px;
+        }
+
+            .product-main-image img {
+                max-height: 400px;
+                padding: 15px;
+            }
+
+        .product-info-section {
+            padding: 30px 25px;
+        }
+
+            .product-info-section::before {
+                height: 2px;
+            }
+
+        .product-title-large {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .price-current {
+            font-size: 24px;
+        }
+
+        .price-original {
+            font-size: 15px;
+        }
+
+        .product-price-section {
+            padding: 14px 0;
+            gap: 12px;
+        }
+
+        .quantity-section {
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .quantity_selector span {
+            width: 44px;
+            height: 44px;
+        }
+
+        .add_to_cart_button a {
+            padding: 16px 30px;
+            font-size: 15px;
+        }
+
+        .product-attributes {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .attribute-item {
+            padding: 18px;
+        }
+
+        .tab-nav {
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+            .tab-nav button {
+                padding: 16px 20px;
+                font-size: 13px;
+                white-space: nowrap;
+                flex: 0 0 auto;
+            }
+
+                .tab-nav button.active::after {
+                    height: 3px;
+                }
+
+        .tab-content {
+            padding: 30px 20px;
+            font-size: 14px;
+        }
+
+            .tab-content h3,
+            .tab-content h4 {
+                font-size: 18px;
+                margin-top: 20px;
+            }
+
+        .thumbnail-item {
+            width: 80px;
+            height: 80px;
+        }
+
+        .trust-badges {
+            padding: 20px;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .badge-item {
+            font-size: 12px;
+            min-width: 100px;
+        }
+
+        .badge-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .product-actions {
+            flex-direction: row;
+            gap: 12px;
+        }
+
+        .action-button {
+            flex: 1;
+            min-width: auto;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+            .action-button i {
+                font-size: 14px;
+            }
+
+        .product-rating {
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 14px 0;
+        }
+
+        .rating-stars {
+            font-size: 13px;
+        }
+
+        .related-products {
+            padding: 50px 0 60px;
+            margin-top: 40px;
+        }
+
+            .related-products .section-header .tit3 {
+                font-size: 28px;
+                margin-bottom: 25px;
+            }
+
+        .related-grid {
+            margin-left: 70px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 16px;
+            padding: 0 10px;
+        }
+
+        .related-card {
+            padding: 10px;
+        }
+
+            .related-card img {
+                height: 120px;
+            }
+
+            .related-card .card-title {
+                font-size: 12px;
+            }
+
+            .related-card .card-price {
+                font-size: 13px;
+            }
+
+        .related-products {
+            padding: 40px 0 50px;
+            margin-top: 30px;
+        }
+
+        .product-metrics {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .specifications-table {
+            font-size: 13px;
+        }
+
+            .specifications-table th,
+            .specifications-table td {
+                padding: 10px;
+            }
+
+        .qa-item:hover {
+            padding-left: 5px;
+            margin-left: 0;
+        }
+
+        .qa-answer {
+            font-size: 13px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .product-title-large {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .price-current {
+            font-size: 22px;
+        }
+
+        .price-discount-badge {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .product-main-image {
+            min-height: 300px;
+        }
+
+            .product-main-image img {
+                max-height: 300px;
+            }
+
+        .zoom-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
+            top: 15px;
+            right: 15px;
+        }
+
+        .quantity-label {
+            font-size: 13px;
+            min-width: 70px;
+        }
+
+        .quantity_selector {
+            border-radius: 8px;
+        }
+
+            .quantity_selector span {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+        #quantity_value {
+            min-width: 50px;
+            font-size: 16px;
+        }
+
+        .add_to_cart_button a {
+            padding: 14px 24px;
+            font-size: 13px;
+            gap: 8px;
+            letter-spacing: 0;
+        }
+
+            .add_to_cart_button a i {
+                font-size: 16px;
+            }
+
+        .product-info-section {
+            padding: 20px 18px;
+        }
+
+        .product-sku {
+            font-size: 11px;
+            padding: 4px 10px;
+            margin-bottom: 10px;
+        }
+
+        .tab-nav button {
+            padding: 12px 14px;
+            font-size: 11px;
+        }
+
+        .tab-content {
+            padding: 20px 15px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+            .tab-content h3,
+            .tab-content h4 {
+                font-size: 16px;
+                margin-top: 18px;
+                margin-bottom: 10px;
+            }
+
+        .trust-badges {
+            padding: 20px;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .badge-item {
+            font-size: 12px;
+            min-width: 100px;
+        }
+
+        .badge-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .product-actions {
+            flex-direction: row;
+            gap: 12px;
+        }
+
+        .action-button {
+            flex: 1;
+            min-width: auto;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+            .action-button i {
+                font-size: 14px;
+            }
+
+        .product-rating {
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 14px 0;
+        }
+
+        .rating-stars {
+            font-size: 13px;
+        }
+
+        .related-products {
+            padding: 50px 0 60px;
+            margin-top: 40px;
+        }
+
+            .related-products .section-header .tit3 {
+                font-size: 28px;
+                margin-bottom: 25px;
+            }
+
+        .related-grid {
+            margin-left: 70px;
+            gap: 18px;
+            padding: 0 10px;
+        }
+
+        .related-card {
+            padding: 12px;
+        }
+
+            .related-card img {
+                height: 160px;
+            }
+
+            .related-card .card-price {
+                font-size: 16px;
+            }
+
+        .specifications-table {
+            font-size: 13px;
+        }
+
+            .specifications-table th,
+            .specifications-table td {
+                padding: 10px;
+            }
+    }
+
+    @@media (max-width: 768px) {
+        .specifications-table {
+            font-size: 13px;
+        }
+
+            .specifications-table th,
+            .specifications-table td {
+                padding: 10px;
+            }
+
+        .product-metrics {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .qa-item:hover {
+            padding-left: 5px;
+            margin-left: 0;
+        }
+
+        .qa-answer {
+            font-size: 13px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .tit6 {
+            font-size: 28px;
+        }
+
+        .product-title-large {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .price-wrapper {
+            gap: 8px;
+        }
+
+        .price-current {
+            font-size: 20px;
+        }
+
+        .price-original {
+            font-size: 13px;
+        }
+
+        .product-attributes {
+            margin: 18px 0 20px;
+        }
+
+        .attribute-item {
+            padding: 14px;
+        }
+
+        .bread-crumb {
+            font-size: 13px;
+        }
+
+        .product-metrics {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+        }
+
+        .specifications-table {
+            font-size: 12px;
+        }
+
+            .specifications-table .spec-label {
+                min-width: 100px;
+            }
+
+        .qa-section {
+            padding: 15px;
+        }
+
+        .qa-header {
+            font-size: 15px;
+        }
+
+        .ask-question-btn {
+            width: 100%;
+        }
+    }
+
+    /* Trust Badges Styling */
+    .trust-badges {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+        border-radius: 12px;
+        margin: 20px 0 25px;
+        border: 1px solid #f0f0f0;
+        flex-wrap: wrap;
+    }
+
+    .badge-item {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+        .badge-item:hover {
+            background: #f9f9f9;
+            transform: translateY(-2px);
+        }
+
+    .badge-icon {
+        font-size: 32px;
+        color: #fe4c50;
+        margin-bottom: 8px;
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+    .badge-item:hover .badge-icon {
+        transform: scale(1.15);
+    }
+
+    .badge-item {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Related products header and cards polish */
+    .related-products {
+        padding: 50px 0 70px;
+        background: linear-gradient(180deg, #fbfbfb 0%, #ffffff 100%);
+        border-radius: 12px;
+        margin-top: 40px;
+        position: relative;
+    }
+
+        .related-products::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent 0%, #fe4c50 50%, transparent 100%);
+            border-radius: 2px;
+        }
+
+        .related-products .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin-bottom: 35px;
+        }
+
+            .related-products .section-header .tit3 {
+                font-size: 24px;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+                margin: 0 0 15px 0;
+                color: #1a1a1a;
+                position: relative;
+            }
+
+                .related-products .section-header .tit3::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -12px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 80px;
+                    height: 4px;
+                    background: linear-gradient(90deg, #fe4c50 0%, #ff6c70 100%);
+                    border-radius: 3px;
+                    box-shadow: 0 3px 10px rgba(254, 76, 80, 0.25);
+                }
+
+            .related-products .section-header .underline {
+                width: 0;
+                height: 0;
+                display: none;
+            }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 20px;
+        padding: 0 15px;
+        margin-left: 70px;
+    }
+
+    .related-card {
+        background: white;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border: 1px solid #f0f0f0;
+        position: relative;
+        background: white;
+    }
+
+        .related-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fe4c50 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .related-card:hover::before {
+            opacity: 1;
+        }
+
+        .related-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+            border-color: #fe4c50;
+            background: white;
+        }
+
+        .related-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+            padding: 10px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin-bottom: 8px;
+        }
+
+        .related-card:hover img {
+            transform: scale(1.08);
+            filter: brightness(1.05);
+        }
+
+        .related-card .card-body {
+            padding: 8px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .related-card .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 6px 0;
+            color: #222;
+            line-height: 1.3;
+            transition: all 0.3s ease;
+            min-height: 32px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .related-card:hover .card-title {
+            color: #fe4c50;
+        }
+
+        .related-card .card-price {
+            font-size: 14px;
+            font-weight: 900;
+            color: #fe4c50;
+            margin: 8px 0 10px;
+            animation: priceEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+            .related-card .card-price strike {
+                color: #999;
+                font-size: 11px;
+                font-weight: 600;
+                margin-left: 6px;
+            }
+
+        .related-card .card-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+            .related-card .card-actions a {
+                flex: 1;
+                padding: 7px 10px;
+                background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+                color: white;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 700;
+                font-size: 11px;
+                text-align: center;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+            }
+
+                .related-card .card-actions a:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 14px rgba(254, 76, 80, 0.3);
+                }
+
+    @@media (max-width:768px) {
+        .related-card img {
+            height: 120px;
+        }
+
+        .related-products .tit3 {
+            font-size: 22px;
+        }
+
+        .related-products {
+            padding: 40px 0 50px;
+            margin-top: 30px;
+        }
+
+        .related-grid {
+            margin-left: 70px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 16px;
+        }
+
+        .related-card {
+            padding: 10px;
+        }
+
+            .related-card .card-title {
+                font-size: 12px;
+            }
+
+            .related-card .card-price {
+                font-size: 13px;
+            }
+    }
+
+    @@media (max-width:576px) {
+        .related-grid {
+            margin-left: 70px;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            padding: 0 8px;
+        }
+
+        .related-card {
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+            .related-card img {
+                height: 100px;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 6px;
+            }
+
+            .related-card .card-title {
+                font-size: 11px !important;
+                margin: 4px 0;
+                min-height: 28px;
+            }
+
+            .related-card .card-price {
+                font-size: 12px !important;
+                margin: 5px 0 6px;
+            }
+
+            .related-card .card-actions {
+                margin-top: 6px !important;
+                padding-top: 6px !important;
+                gap: 6px !important;
+            }
+
+                .related-card .card-actions a {
+                    padding: 6px 8px !important;
+                    font-size: 10px !important;
+                }
+
+        .related-products .section-header .tit3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .related-products .section-header {
+            margin-bottom: 20px;
+        }
+    }
+</style>
+<section class="bg-title-page flex-c-m p-t-120 p-b-60 p-l-15 p-r-15"
+         style="background-image: url(/Content/assets/images/bg-title-page-3.jpg); background-attachment: fixed; background-size: cover;">
+    <h2 class="tit6 t-center" style="text-shadow: 0 2px 8px rgba(0,0,0,0.3);"> Chi tiết sản phẩm </h2>
+</section>
+
+<section>
+    <div class="bread-crumb bo5-b p-t-17 p-b-17" style="background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <div class="container">
+            <a href="/" class="txt27" style="color: #fe4c50; transition: all 0.2s ease;" onmouseover="this.style.color='#ff6c70';" onmouseout="this.style.color='#fe4c50';"> <i class="fa fa-home"></i> Trang chủ </a>
+            <span class="txt29 m-l-10 m-r-10" style="color: #ddd;">/</span>
+            <a href="/products" class="txt27" style="color: #fe4c50; transition: all 0.2s ease;" onmouseover="this.style.color='#ff6c70';" onmouseout="this.style.color='#fe4c50';"> <i class="fa fa-shopping-bag"></i> Cửa hàng </a>
+            <span class="txt29 m-l-10 m-r-10" style="color: #ddd;">/</span>
+            <span class="txt29" style="color: #666;"> @Model.Title </span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="product-detail-wrapper" style="padding-top: 60px; padding-bottom: 80px;">
+            <!-- Product Image Gallery -->
+            <div>
+                @*@if (Model.ProductImage != null && Model.ProductImage.Any())
+                {*@
+                    <div class="product-gallery">
+                        <div class="product-main-image">
+                            @*@{
+                                    var defaultImage = Model.ProductImage.FirstOrDefault(x => x.IsDefault && !string.IsNullOrEmpty(x.Image));
+                                    var mainImage = defaultImage != null ? defaultImage.Image : Model.ProductImage.FirstOrDefault(x => !string.IsNullOrEmpty(x.Image))?.Image;
+                                    if (string.IsNullOrEmpty(mainImage))
+                                    {
+                                        mainImage = "/Content/assets/images/placeholder.jpg";
+                                    }
+                                }*@
+
+                            @{
+                                var mainImage = !string.IsNullOrEmpty(Model.Image)
+                                    ? (Model.Image.StartsWith("/") ? Model.Image : "/Uploads/images/sanpham/" + Model.Image)
+                                    : "/Content/assets/images/placeholder.jpg";
+                            }
+
+                            @*<img id="mainProductImage" src="@mainImage" alt="@Model.Title" loading="lazy" decoding="async" />
+                                <div class="zoom-icon" title="Click để phóng to">
+                                    <i class="fa fa-search-plus"></i>
+                                </div>*@
+
+                            <img id="mainProductImage" src="@mainImage" alt="@Model.Title"
+                                 loading="lazy" decoding="async"
+                                 onerror="this.src='/Content/assets/images/placeholder.jpg';" />
+                            <div class="zoom-icon" title="Click để phóng to">
+                                <i class="fa fa-search-plus"></i>
+                            </div>
+                        </div>
+                        @if (Model.ProductImage.Count > 1)
+                        {
+                            <div class="product-thumbnails">
+                                @foreach (var img in Model.ProductImage.Where(x => !string.IsNullOrEmpty(x.Image)))
+                                {
+                                    <div class="thumbnail-item @(img.IsDefault ? "active" : "")" data-src="@img.Image" title="@Model.Title" role="button" tabindex="0" aria-label="Chọn ảnh sản phẩm">
+                                        <img src="@img.Image" alt="@Model.Title" loading="lazy" decoding="async" />
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+            </div>
+
+            <!-- Product Info -->
+            <div>
+                <div class="product-info-section">
+                    <h1 class="product-title-large">@Model.Title</h1>
+                    <span class="product-sku">SKU: @(Model.Id)</span>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px; line-height: 1.6;">@Model.Description</p>
+                    }
+
+                    <!-- Price Section -->
+                    <div class="product-price-section">
+                        @if (Model.PriceSale > 0)
+                        {
+                            var discount = Math.Round(((Convert.ToDouble(Model.Price) - Convert.ToDouble(Model.PriceSale)) / Convert.ToDouble(Model.Price)) * 100);
+                            <div class="price-wrapper">
+                                <div class="price-current">@WebTH.Common.Common.FormatNumber(Model.PriceSale, 0) ₫</div>
+                                <div class="price-original">@WebTH.Common.Common.FormatNumber(Model.Price, 0) ₫</div>
+                            </div>
+                            <div class="price-discount-badge">-@discount%</div>
+                        }
+                        else
+                        {
+                            <div class="price-current">@WebTH.Common.Common.FormatNumber(Model.Price, 0) ₫</div>
+                        }
+                    </div>
+
+                    <div class="stock-indicator in-stock">
+                        <span class="stock-dot"></span>
+                        <span>Còn hàng - Sẵn sàng giao hàng</span>
+                    </div>
+
+                    <div class="view-count">
+                        <i class="fa fa-eye"></i> Lượt xem: <strong>@Model.ViewCount</strong>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="badge-item">
+                            <div class="badge-icon"><i class="fa fa-shield"></i></div>
+                            <div>100% Chính hãng</div>
+                        </div>
+                        <div class="badge-item">
+                            <div class="badge-icon"><i class="fa fa-truck"></i></div>
+                            <div>Giao hàng nhanh</div>
+                        </div>
+                        <div class="badge-item">
+                            <div class="badge-icon"><i class="fa fa-undo"></i></div>
+                            <div>Hoàn tiền dễ dàng</div>
+                        </div>
+                        <div class="badge-item">
+                            <div class="badge-icon"><i class="fa fa-headphones"></i></div>
+                            <div>Hỗ trợ 24/7</div>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Section -->
+                    <div class="quantity-section">
+                        <span class="quantity-label">Số lượng:</span>
+                        <div class="quantity_selector">
+                            <span class="minus"><i class="fa fa-minus" aria-hidden="true"></i></span>
+                            <span id="quantity_value">1</span>
+                            <span class="plus"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart & Actions -->
+                    <div class="add_to_cart_button">
+                        <a href="#" class="btnAddToCart" data-id="@Model.Id" aria-label="Thêm vào giỏ hàng" role="button"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ</a>
+                    </div>
+
+                    <div class="product-actions">
+                        <button class="action-button wishlist-btn" data-id="@Model.Id" title="Thêm vào danh sách yêu thích" aria-pressed="false" aria-label="Thêm vào yêu thích">
+                            <i class="fa fa-heart-o"></i> Yêu thích
+                        </button>
+                        <button class="action-button share-btn" title="Chia sẻ sản phẩm" aria-label="Chia sẻ sản phẩm">
+                            <i class="fa fa-share"></i> Chia sẻ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Attributes -->
+        <div class="product-attributes" style="margin-bottom: 40px;">
+            <div class="attribute-item">
+                <div class="attribute-label">Thương hiệu</div>
+                <div class="attribute-value">PetFood</div>
+            </div>
+            <div class="attribute-item">
+                <div class="attribute-label">Xuất xứ</div>
+                <div class="attribute-value">Việt Nam</div>
+            </div>
+            <div class="attribute-item">
+                <div class="attribute-label">Nơi sản xuất</div>
+                <div class="attribute-value">Việt Nam</div>
+            </div>
+            <div class="attribute-item">
+                <div class="attribute-label">Hạn sử dụng</div>
+                <div class="attribute-value">240 ngày từ ngày sản xuất</div>
+            </div>
+        </div>
+
+        <!-- Product Metrics -->
+        <div class="product-metrics">
+            <div class="metric-item">
+                <span class="metric-value">@Model.ViewCount</span>
+                <span class="metric-label">Lượt Xem</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-value">4.8★</span>
+                <span class="metric-label">Đánh Giá</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-value">2.5K+</span>
+                <span class="metric-label">Bình Luận</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-value">95%</span>
+                <span class="metric-label">Hài Lòng</span>
+            </div>
+        </div>
+
+        <!-- Product Tabs -->
+        <div class="product-tabs">
+            <div class="tab-nav">
+                <button class="tab-button active" data-tab="details">Thông tin chi tiết</button>
+                <button class="tab-button" data-tab="specifications">Thông số kỹ thuật</button>
+                <button class="tab-button" data-tab="qa">Hỏi & Đáp</button>
+                <button class="tab-button" data-tab="reviews">Đánh giá & Bình luận</button>
+            </div>
+
+            <div id="details" class="tab-content active">
+                @if (!string.IsNullOrEmpty(Model.Detail))
+                {
+                    @Html.Raw(Model.Detail)
+                }
+                else
+                {
+                    <p>Không có thông tin chi tiết cho sản phẩm này.</p>
+                }
+            </div>
+
+            <div id="specifications" class="tab-content">
+                <table class="specifications-table">
+                    <thead>
+                        <tr>
+                            <th>Thông số</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="spec-label">Thương hiệu</td>
+                            <td class="spec-value">REOS Pet Food</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Xuất xứ</td>
+                            <td class="spec-value">Việt Nam</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Nơi sản xuất</td>
+                            <td class="spec-value">Việt Nam</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Hạn sử dụng</td>
+                            <td class="spec-value">240 ngày từ ngày sản xuất</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Loại đóng gói</td>
+                            <td class="spec-value">Bao zip-lock chuyên dụng</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Số lượng trong gói</td>
+                            <td class="spec-value">400g / 500g / 1kg</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Hình thức bán hàng</td>
+                            <td class="spec-value">Lẻ</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Độ tuổi phù hợp</td>
+                            <td class="spec-value">Phù hợp tất cả các độ tuổi</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="qa" class="tab-content">
+                <div class="qa-section">
+                    <div class="qa-header">
+                        <i class="fa fa-question-circle"></i>
+                        Câu hỏi thường gặp
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <span class="qa-toggle">+</span>
+                            Sản phẩm này có phù hợp với chó con không?
+                        </div>
+                        <div class="qa-answer">
+                            Có, sản phẩm REOS được thiết kế để phù hợp với cả chó con và chó trưởng thành. Tuy nhiên, với chó con, bạn nên bắt đầu với lượng nhỏ và tăng dần để cho cơ thể chúng thích nghi. Nên tham khảo ý kiến bác sĩ thú y trước khi thay đổi chế độ ăn.
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <span class="qa-toggle">+</span>
+                            Bảo quản sản phẩm như thế nào?
+                        </div>
+                        <div class="qa-answer">
+                            Nên bảo quản sản phẩm trong nơi khô ráo, thoáng mát, tránh ánh sáng trực tiếp và độ ẩm cao. Sau khi mở bao, hãy đóng kín bằng kẹp hoặc chuyển vào hộp kín để giữ được tính tươi của sản phẩm. Bảo quản trong tủ lạnh sẽ giúp kéo dài thời gian sử dụng.
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <span class="qa-toggle">+</span>
+                            Có bảo hành hoặc đổi trả được không?
+                        </div>
+                        <div class="qa-answer">
+                            Nếu sản phẩm bị hỏng trong quá trình vận chuyển hoặc không đúng như mô tả, bạn có thể liên hệ với chúng tôi trong vòng 48 giờ để yêu cầu đổi hoặc hoàn tiền. Vui lòng cung cấp hình ảnh chứng minh để chúng tôi xử lý nhanh chóng.
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <span class="qa-toggle">+</span>
+                            Thành phần dinh dưỡng chính là gì?
+                        </div>
+                        <div class="qa-answer">
+                            Sản phẩm REOS chứa protein từ thịt tự nhiên, chất béo cần thiết, carbohydrate, vitamin và khoáng chất cân bằng. Chi tiết đầy đủ về thành phần dinh dưỡng có thể xem trên bao bì sản phẩm hoặc liên hệ với chúng tôi để được tư vấn chi tiết.
+                        </div>
+                    </div>
+
+                    <button class="ask-question-btn" onclick="this.style.display='none'; document.getElementById('ask-form').style.display='block';">
+                        <i class="fa fa-pencil"></i> Đặt câu hỏi của bạn
+                    </button>
+
+                    <div id="ask-form" style="display:none; margin-top:20px; padding:20px; background:white; border-radius:8px; border:1px solid #e8e8e8;">
+                        <h4 style="margin-bottom:15px; color:#1a1a1a;">Gửi câu hỏi cho chúng tôi</h4>
+                        <input type="text" placeholder="Tên của bạn" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e8e8e8; border-radius:6px; font-size:14px;">
+                        <textarea placeholder="Câu hỏi của bạn..." rows="4" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e8e8e8; border-radius:6px; font-size:14px;"></textarea>
+                        <button style="background:linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%); color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:700;">Gửi câu hỏi</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reviews" class="tab-content">
+                @Html.Action("_Review", "Review", new { productId = Model.Id })
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- Vet Recommendations Section -->
+<section class="vet-recommendations">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="vet-rec-header">
+                    <h3 class="tit3">
+                        <i class="fa fa-hospital-o"></i> Khuyến Cáo Từ Bác Sĩ Thú Y
+                    </h3>
+                    <div class="underline"></div>
+                    <p class="vet-rec-subtitle">Xem những lời khuyên từ các bác sĩ thú y chuyên nghiệp về sản phẩm này</p>
+                </div>
+
+                <div class="vet-rec-content">
+                    @{
+                        // Check if there are vet recommendations for this product
+                        var vetRecommendations = ViewBag.VetRecommendations as IEnumerable<WebTH.Models.VetRecommendation>;
+                        if (vetRecommendations != null && vetRecommendations.Count() > 0)
+                        {
+                            <!-- Display Vet Recommendations -->
+                            <div class="vet-rec-grid">
+                                @foreach (var rec in vetRecommendations.Take(3))
+                                {
+                                    var clinic = rec.VetClinic;
+                                    <div class="vet-rec-card">
+                                        <div class="vet-clinic-info">
+                                            <div class="vet-clinic-logo">
+                                                @if (clinic != null && !string.IsNullOrEmpty(clinic.Logo))
+                                                {
+                                                    <img src="@clinic.Logo" alt="@(clinic.ClinicName ?? "Phòng khám")" />
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa fa-hospital-o"></i>
+                                                }
+                                            </div>
+                                            <div class="vet-clinic-details">
+                                                <h5>@(clinic != null ? clinic.ClinicName : "Phòng khám thú y")</h5>
+                                                @if (clinic != null && clinic.IsVerified)
+                                                {
+                                                    <span class="verified-badge">
+                                                        <i class="fa fa-check-circle"></i> Xác Minh
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="rating-info">
+                                            <span class="stars">
+                                                @{
+                                                    var avgRating = clinic != null ? clinic.AverageRating : 0m;
+                                                }
+                                                @for (int i = 0; i < Math.Floor(avgRating); i++)
+                                                {
+                                                    <i class="fa fa-star"></i>
+                                                }
+                                                @for (int i = (int)Math.Floor(avgRating); i < 5; i++)
+                                                {
+                                                    <i class="fa fa-star-o"></i>
+                                                }
+                                            </span>
+                                            <span class="rating-value">@avgRating.ToString("F1")/5</span>
+                                        </div>
+                                        <p class="rec-text">@rec.ReccommendationReason</p>
+                                        <div class="rec-tags">
+                                            @if (!string.IsNullOrEmpty(rec.PetType))
+                                            {
+                                                <span class="tag"><i class="fa fa-paw"></i> @rec.PetType</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(rec.HealthCondition))
+                                            {
+                                                <span class="tag"><i class="fa fa-heartbeat"></i> @rec.HealthCondition</span>
+                                            }
+                                        </div>
+                                        <a href="@Url.Action("Details", "Vet", new { id = rec.ClinicId })" class="view-clinic-btn">
+                                            <i class="fa fa-arrow-right"></i> Xem Phòng Khám
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            <div class="text-center mt-4">
+                                <a href="@Url.Action("ProductRecommendations", "Vet", new { productId = Model.Id })" class="btn btn-primary btn-lg">
+                                    <i class="fa fa-lightbulb-o"></i> Xem Tất Cả Khuyến Cáo (@vetRecommendations.Count())
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- No Vet Recommendations -->
+                            <div class="no-vet-recs">
+                                <i class="fa fa-info-circle"></i>
+                                <p>Chưa có khuyến cáo từ bác sĩ thú y cho sản phẩm này</p>
+                                <p class="sub-text">Hãy kiếm sức khỏe của thú cưng bạn từ các chuyên gia được xác minh</p>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .vet-recommendations {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            padding: 60px 0;
+            margin: 40px 0;
+            border-radius: 12px;
+        }
+
+        .vet-rec-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+            .vet-rec-header .tit3 {
+                font-size: 28px;
+                font-weight: 700;
+                color: #1a1a1a;
+                margin-bottom: 10px;
+            }
+
+            .vet-rec-header .underline {
+                display: inline-block;
+                width: 80px;
+                height: 4px;
+                background: linear-gradient(90deg, #fe4c50 0%, #ff6c70 100%);
+                margin: 10px auto;
+            }
+
+        .vet-rec-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .vet-rec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .vet-rec-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+            .vet-rec-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+        .vet-clinic-info {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .vet-clinic-logo {
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+            .vet-clinic-logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .vet-clinic-logo i {
+                font-size: 30px;
+                color: #fe4c50;
+            }
+
+        .vet-clinic-details h5 {
+            margin: 0 0 5px 0;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 16px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+            .verified-badge i {
+                font-size: 10px;
+            }
+
+        .rating-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+            .rating-info .stars {
+                display: flex;
+                gap: 3px;
+                font-size: 14px;
+            }
+
+                .rating-info .stars i.fa-star {
+                    color: #ffc107;
+                }
+
+                .rating-info .stars i.fa-star-o {
+                    color: #ddd;
+                }
+
+        .rating-value {
+            font-weight: 700;
+            color: #fe4c50;
+            font-size: 14px;
+        }
+
+        .rec-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .rec-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+            .rec-tags .tag {
+                background: #e8f4f8;
+                color: #0099cc;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+        .view-clinic-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+            width: 100%;
+            text-align: center;
+        }
+
+            .view-clinic-btn:hover {
+                transform: scale(1.02);
+                box-shadow: 0 4px 12px rgba(254, 76, 80, 0.3);
+                color: white;
+            }
+
+        .no-vet-recs {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+        }
+
+            .no-vet-recs i {
+                font-size: 48px;
+                color: #ddd;
+                margin-bottom: 15px;
+                display: block;
+            }
+
+            .no-vet-recs p {
+                color: #999;
+                font-size: 16px;
+                margin: 10px 0;
+            }
+
+            .no-vet-recs .sub-text {
+                font-size: 14px;
+                color: #bbb;
+            }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #fe4c50 0%, #ff6c70 100%) !important;
+            border: none;
+            transition: all 0.2s;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.02);
+                box-shadow: 0 6px 15px rgba(254, 76, 80, 0.3);
+            }
+
+        @@media (max-width: 768px) {
+            .vet-rec-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vet-recommendations {
+                padding: 40px 0;
+            }
+
+            .vet-rec-header .tit3 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</section>
+
+<section class="related-products">
+    <div class="section-header">
+        <h3 class="tit3">Sản phẩm cùng danh mục</h3>
+        <div class="underline"></div>
+    </div>
+    <div class="related-grid">
+        <style>
+            .item-gallery:hover .favorite {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            .favorite {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                color: #b9b4c7;
+                width: 24px;
+                height: 24px;
+                visibility: hidden;
+                opacity: 0;
+            }
+
+            .favorite_left {
+                left: 15px;
+            }
+
+            .favorite.active {
+                visibility: visible;
+                opacity: 1;
+            }
+
+                .favorite.active::after {
+                    font-family: 'FontAwesome';
+                    content: '\f004';
+                    color: #fe4c50;
+                }
+
+            .favorite::after {
+                font-family: 'FontAwesome';
+                content: '\f08a';
+            }
+
+            .favorite:hover::after {
+                color: #fe4c50;
+            }
+        </style>
+
+        @foreach (var relatedProduct in ViewBag.RelatedProducts as List<WebTH.Models.EF.Product>)
+        {
+           @* //var strImage = "";
+            //var img = relatedProduct.ProductImage.FirstOrDefault(x => x.IsDefault && !string.IsNullOrEmpty(x.Image));
+            //if (img == null)
+            //{
+            //    img = relatedProduct.ProductImage.FirstOrDefault(x => !string.IsNullOrEmpty(x.Image));
+            //}
+            //if (img != null)
+            //{
+            //    strImage = img.Image;
+            //}
+            //else
+            //{
+            //    strImage = "/Content/assets/images/placeholder.jpg";
+            //}*@
+            @*<div class="col-md-4 col-lg-3">
+                    <div class="product-item">
+                        <div class="product-image">
+                            <img src="@strImage" alt="@relatedProduct.Title" />
+                        </div>
+                        <h4 class="product-title">
+                            <a href="@Url.Action("Detail", "Products", new { id = relatedProduct.Id })">@relatedProduct.Title</a>
+                        </h4>
+                        <p class="product-price">
+                            @if (relatedProduct.PriceSale > 0)
+                            {
+                                <span class="price-sale">@WebTH.Common.Common.FormatNumber(relatedProduct.PriceSale, 0)</span>
+                                <span class="price-original"><strike>@WebTH.Common.Common.FormatNumber(relatedProduct.Price, 0)</strike></span>
+                            }
+                            else
+                            {
+                                <span class="price">@WebTH.Common.Common.FormatNumber(relatedProduct.Price, 0)</span>
+                            }
+                        </p>
+                    </div>
+                </div>*@
+
+            // ✅ Lấy thẳng từ cột Image của tb_Product
+            var strImage = !string.IsNullOrEmpty(relatedProduct.Image)
+                ? (relatedProduct.Image.StartsWith("/") ? relatedProduct.Image : "/Uploads/images/sanpham/" + relatedProduct.Image)
+                : "/Content/assets/images/placeholder.jpg";
+
+            var wishlist = relatedProduct.Wishlists.FirstOrDefault(x => x.UserName == User.Identity.Name);
+            var isWishlist = false;
+            if (wishlist != null)
+            {
+                isWishlist = true;
+            }
+
+            <div>
+                <div class="related-card isotope-item bo-rad-10 hov-img-zoom juice pos-relative @relatedProduct.ProductCategory.Alias">
+                    <a href="/chi-tiet/@relatedProduct.Alias-p@(relatedProduct.Id)" class="product-link" style="text-decoration:none; color:inherit;">
+                        <img src="@strImage" alt="@relatedProduct.Title" loading="lazy" decoding="async" />
+                        <div class="card-body">
+                            <div>
+                                <div class="card-title">@relatedProduct.Title</div>
+                                @if (relatedProduct.PriceSale > 0)
+                                {
+                                    <div class="card-price">@WebTH.Common.Common.FormatNumber(relatedProduct.PriceSale, 0) ₫ <span style="font-weight:600; color:#888; font-size:13px; margin-left:6px;"><strike>@WebTH.Common.Common.FormatNumber(relatedProduct.Price, 0) ₫</strike></span></div>
+                                }
+                                else
+                                {
+                                    <div class="card-price">@WebTH.Common.Common.FormatNumber(relatedProduct.Price, 0) ₫</div>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                    <div class="card-actions" style="padding:0 12px 12px;font-size:10px;">
+                        <a href="javascript:void(0);" class="btnAddToCart" data-id="@relatedProduct.Id" aria-label="Thêm vào giỏ hàng" style="flex:1;font-size:10px; display:inline-flex; align-items:center; justify-content:center; padding:10px; background:#fe4c50; color:white; border-radius:8px; text-decoration:none; font-weight:700;"><i class="fa fa-cart-plus" style="margin-right:8px"></i> Thêm vào giỏ hàng</a>
+
+                    </div>
+                    @if (isWishlist == true)
+                    {
+                        <div data-id="@relatedProduct.Id" class="favorite favorite_left active" aria-hidden="false" aria-label="Đã yêu thích"></div>
+
+                    }
+                    else
+                    {
+                        <div data-id="@relatedProduct.Id" class="favorite favorite_left" aria-hidden="true" aria-label="Thêm vào yêu thích"></div>
+
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+
+
+@{
+    @*//var ldImage = Model.ProductImage?.FirstOrDefault(x => x.IsDefault && !string.IsNullOrEmpty(x.Image))?.Image
+            //                            ?? Model.ProductImage?.FirstOrDefault(x => !string.IsNullOrEmpty(x.Image))?.Image
+            //                            ?? "/Content/assets/images/placeholder.jpg";*@
+
+            var ldImage = !string.IsNullOrEmpty(Model.Image)
+            ? (Model.Image.StartsWith("/") ? Model.Image : "/Uploads/images/sanpham/" + Model.Image)
+            : "/Content/assets/images/placeholder.jpg";
+
+
+            var ldPrice = Model.PriceSale > 0 ? Model.PriceSale : Model.Price;
+            var ldAvailability = "http://schema.org/InStock";
+            var ldUrl = Request?.Url != null ? Request.Url.AbsoluteUri : Url.Action("Detail", "Products", new { id = Model.Id });
+        }
+
+        @* JSON-LD structured data for product *@
+    @{
+        var structuredData = new Dictionary<string, object>() {
+        {"@context", "http://schema.org"},
+        {"@type", "Product"},
+        {"name", Model.Title ?? string.Empty},
+        {"image", new[] { ldImage } },
+        {"description", Model.Description ?? string.Empty},
+        {"sku", Model.Id},
+        {"offers", new Dictionary<string, object>() {
+            {"@type", "Offer"},
+            {"url", ldUrl},
+            {"priceCurrency", "VND"},
+            {"price", ldPrice},
+            {"availability", ldAvailability}
+        }}
+    };
+    }
+    <script type="application/ld+json">
+    @Html.Raw(System.Web.Helpers.Json.Encode(structuredData))
+    </script>
+
+    @section scripts {
+        <script type="text/javascript" src="~/Content/assets/js/shop-detail.js"></script>
+        <script>
+            $(document).ready(function () {
+                // Product Image Gallery
+                $('.thumbnail-item').on('click', function () {
+                    var imgSrc = $(this).data('src');
+                    $('#mainProductImage').attr('src', imgSrc).fadeOut(100).fadeIn(300);
+
+                    $('.thumbnail-item').removeClass('active');
+                    $(this).addClass('active');
+                });
+
+                // Image Zoom on Main Image Click or Zoom Icon Click
+                $('#mainProductImage, .zoom-icon').on('click', function (e) {
+                    e.preventDefault();
+                    var imgSrc = $('#mainProductImage').attr('src');
+
+                    var modal = $('<div class="modal-zoom" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; align-items:center; justify-content:center;"><div style="position:relative;"><img src="' + imgSrc + '" style="max-width:90vh; max-height:90vh; border-radius:8px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);"/><button style="position:absolute; top:15px; right:15px; background:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:28px; color:#fe4c50; width:50px; height:50px; display:flex; align-items:center; justify-content:center; font-weight:bold; transition:all 0.2s ease;" onmouseover="this.style.background=\'#fe4c50\'; this.style.color=\'white\';" onmouseout="this.style.background=\'white\'; this.style.color=\'#fe4c50\';">&times;</button></div></div>');
+
+                    $('body').append(modal);
+                    modal.fadeIn(200);
+                    $('body').css('overflow', 'hidden');
+
+                    modal.on('click', function (e) {
+                        if (e.target === this) {
+                            $(this).fadeOut(200, function () { $(this).remove(); });
+                            $('body').css('overflow', 'auto');
+                        }
+                    });
+
+                    modal.find('button').on('click', function (e) {
+                        e.stopPropagation();
+                        modal.fadeOut(200, function () { $(this).remove(); });
+                        $('body').css('overflow', 'auto');
+                    });
+
+                    $(document).on('keydown', function (e) {
+                        if (e.keyCode === 27) {
+                            modal.fadeOut(200, function () { $(this).remove(); });
+                            $('body').css('overflow', 'auto');
+                            $(document).off('keydown');
+                        }
+                    });
+                });
+
+                // Tab Navigation
+                $('.tab-button').on('click', function () {
+                    var tabName = $(this).data('tab');
+
+                    // Remove active class
+                    $('.tab-button').removeClass('active');
+                    $('.tab-content').removeClass('active');
+
+                    // Add active class
+                    $(this).addClass('active');
+                    $('#' + tabName).addClass('active');
+                });
+
+                //// Quantity Selector
+                //$('.quantity_selector .plus').on('click', function () {
+                //    var val = parseInt($('#quantity_value').text());
+                //    $('#quantity_value').text(val + 1);
+                //});
+
+                //$('.quantity_selector .minus').on('click', function () {
+                //    var val = parseInt($('#quantity_value').text());
+                //    if (val > 1) {
+                //        $('#quantity_value').text(val - 1);
+                //    }
+                //});
+
+                // Wishlist Button
+                $('.wishlist-btn').on('click', function () {
+                    $(this).toggleClass('active');
+                    var productId = $(this).data('id');
+
+                    if ($(this).hasClass('active')) {
+                        $(this).html('<i class="fa fa-heart"></i> Yêu thích');
+                        // Send AJAX to add to wishlist
+                        $.post('/Wishlist/AddToWishlist', { productId: productId }, function (result) {
+                            console.log('Added to wishlist');
+                        });
+                    } else {
+                        $(this).html('<i class="fa fa-heart-o"></i> Yêu thích');
+                        // Send AJAX to remove from wishlist
+                        $.post('/Wishlist/RemoveFromWishlist', { productId: productId }, function (result) {
+                            console.log('Removed from wishlist');
+                        });
+                    }
+                });
+
+                // Share Button
+                $('.share-btn').on('click', function () {
+                    var productUrl = window.location.href;
+                    var productTitle = $('.product-title-large').text();
+
+                    var shareMenu = $('<div style="position:absolute; background:white; border-radius:10px; box-shadow:0 8px 25px rgba(0,0,0,0.15); padding:15px; min-width:200px; margin-top:10px; z-index:100; right:0;"><a href="https://www.facebook.com/sharer/sharer.php?u=' + productUrl + '" target="_blank" style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; color:#1877f2; text-decoration:none; transition:all 0.2s;" onmouseover="this.style.background=\'#f0f0f0\';" onmouseout="this.style.background=\'transparent\';"><i class="fa fa-facebook" style="font-size:20px;"></i> Facebook</a><a href="https://twitter.com/intent/tweet?url=' + productUrl + '&text=' + productTitle + '" target="_blank" style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; color:#1da1f2; text-decoration:none; transition:all 0.2s;" onmouseover="this.style.background=\'#f0f0f0\';" onmouseout="this.style.background=\'transparent\';"><i class="fa fa-twitter" style="font-size:20px;"></i> Twitter</a><a href="mailto:?subject=' + productTitle + '&body=' + productUrl + '" style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; color:#666; text-decoration:none; transition:all 0.2s;" onmouseover="this.style.background=\'#f0f0f0\';" onmouseout="this.style.background=\'transparent\';"><i class="fa fa-envelope" style="font-size:20px;"></i> Email</a><hr style="margin:5px 0;"><a style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; color:#666; text-decoration:none; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background=\'#f0f0f0\';" onmouseout="this.style.background=\'transparent\';"><i class="fa fa-link" style="font-size:20px;"></i> Copy Link</a></div>');
+
+                    $(this).after(shareMenu);
+
+                    shareMenu.find('a:last').on('click', function () {
+                        var temp = $('<input>');
+                        $('body').append(temp);
+                        temp.val(productUrl).select();
+                        document.execCommand('copy');
+                        temp.remove();
+                        alert('Link đã được sao chép!');
+                    });
+
+                    $(document).on('click', function (e) {
+                        if (!$(e.target).closest('.share-btn, [style*="position:absolute"]').length) {
+                            shareMenu.remove();
+                        }
+                    });
+                });
+
+                // Q&A Toggle Functionality
+                $('.qa-question').on('click', function () {
+                    var qaItem = $(this).closest('.qa-item');
+                    qaItem.toggleClass('open');
+
+                    // Close other open items
+                    $('.qa-item.open').not(qaItem).removeClass('open');
+                });
+
+                // Tab Navigation with smooth scrolling
+                $('.tab-button').on('click', function () {
+                    var tabName = $(this).data('tab');
+
+                    // Remove active class
+                    $('.tab-button').removeClass('active');
+                    $('.tab-content').removeClass('active');
+
+                    // Add active class
+                    $(this).addClass('active');
+                    $('#' + tabName).addClass('active');
+
+                    // Smooth scroll to tabs
+                    $('html, body').animate({
+                        scrollTop: $('.product-tabs').offset().top - 100
+                    }, 300);
+                });
+            });
+        </script>
+    }

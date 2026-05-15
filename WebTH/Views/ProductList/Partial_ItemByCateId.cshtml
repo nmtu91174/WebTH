@@ -1,0 +1,66 @@
+@model PagedList.IPagedList<WebTH.Models.EF.Product>
+@using PagedList.Mvc
+
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
+        var strImage = "";
+        var img = item.ProductImage.FirstOrDefault(x => x.IsDefault);
+        if (img != null)
+        {
+            strImage = img.Image;
+        }
+
+        var wishlist = item.Wishlists.FirstOrDefault(x => x.UserName == User.Identity.Name);
+        var isWishlist = false;
+        if (wishlist != null)
+        {
+            isWishlist = true;
+        }
+
+        <div class="item-gallery isotope-item bo-rad-10 hov-img-zoom juice pos-relative @item.ProductCategory.Alias">
+            <a href="/chi-tiet/@item.Alias-p@(item.Id)">
+                <img src="@strImage" alt="@item.Title" />
+            </a>
+            <a href="/chi-tiet/@item.Alias-p@(item.Id)" class="bgTH">
+                <div class="shop-blo1 flex-sb-m">
+                    <h1>@item.Title</h1>
+                    @if (item.PriceSale > 0)
+                    {
+                        <p class="txt36">@WebTH.Common.Common.FormatNumber(item.PriceSale, 0)<span>@WebTH.Common.Common.FormatNumber(item.Price, 0)</span></p>
+                    }
+                    else
+                    {
+                        <p class="txt36">@WebTH.Common.Common.FormatNumber(item.Price, 0)</p>
+                    }
+                </div>
+            </a>
+            <div class="cart-blo1">
+                <a href="" class="btnAddToCart" data-id="@item.Id"><i class="fa fa-cart-plus" aria-hidden="true"></i></a>
+            </div>
+            @if (isWishlist == true)
+            {
+                <div data-id="@item.Id" class="favorite favorite_left active"></div>
+            }
+            else
+            {
+                <div data-id="@item.Id" class="favorite favorite_left"></div>
+            }
+        </div>
+    }
+
+    <div class="product-list-pager" style="width:100%; text-align:center; margin-top:20px;">
+        @Html.PagedListPager(
+            Model,
+            page => Url.Action("Partial_ItemByCateId", "ProductList", new { page }),
+            new PagedListRenderOptions
+            {
+                DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
+                DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
+                DisplayLinkToPreviousPage = PagedListDisplayMode.IfNeeded,
+                DisplayLinkToNextPage = PagedListDisplayMode.IfNeeded,
+                MaximumPageNumbersToDisplay = 5
+            })
+    </div>
+}

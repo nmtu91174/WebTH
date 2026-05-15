@@ -1,0 +1,171 @@
+﻿@model WebTH.Models.VetClinicRating
+
+@{
+    ViewBag.Title = "Sửa Đánh Giá";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-2">
+                <i class="fas fa-edit"></i> Sửa Đánh Giá
+            </h1>
+            <p class="text-muted mb-4">Phòng khám: <strong>@ViewBag.ClinicName</strong></p>
+
+            @using (Html.BeginForm("EditRating", "AdminVet", new
+            {
+                Area = "Admin",
+                clinicId = ViewBag.ReturnClinicId,
+                filter = ViewBag.ReturnFilter,
+                page = ViewBag.ReturnPage
+            }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.ClinicId)
+
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="mb-0">Mã đánh giá: #@Model.Id</h6>
+                            </div>
+                            <div class="col-auto">
+                                @if (Model.IsApproved)
+                                {
+                                    <span class="badge badge-success"><i class="fas fa-check-circle"></i> Đã duyệt</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning"><i class="fas fa-clock"></i> Chờ duyệt</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><strong>Tên người đánh giá *</strong></label>
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Nhập tên người đánh giá" })
+                                    @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><strong>Email</strong></label>
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "email@example.com" })
+                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><strong>Số điện thoại</strong></label>
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "0xxx xxx xxx" })
+                                    @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><strong>Điểm đánh giá tổng *</strong></label>
+                                    @Html.TextBoxFor(m => m.Rating, new { @class = "form-control", type = "number", min = "1", max = "5" })
+                                    @Html.ValidationMessageFor(m => m.Rating, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label"><strong>Bình luận</strong></label>
+                            @Html.TextAreaFor(m => m.Comment, new { @class = "form-control", rows = "4", placeholder = "Nội dung đánh giá" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label"><strong>Ngày khám</strong></label>
+                            @Html.TextBoxFor(m => m.VisitDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6 class="mb-3">Điểm chi tiết (1-5, có thể để trống)</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Chất lượng dịch vụ</label>
+                                    @Html.TextBoxFor(m => m.ServiceQuality, new { @class = "form-control", type = "number", min = "1", max = "5" })
+                                    @Html.ValidationMessageFor(m => m.ServiceQuality, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Chuyên nghiệp</label>
+                                    @Html.TextBoxFor(m => m.Professionalism, new { @class = "form-control", type = "number", min = "1", max = "5" })
+                                    @Html.ValidationMessageFor(m => m.Professionalism, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Cơ sở vật chất</label>
+                                    @Html.TextBoxFor(m => m.Facility, new { @class = "form-control", type = "number", min = "1", max = "5" })
+                                    @Html.ValidationMessageFor(m => m.Facility, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Giá trị</label>
+                                    @Html.TextBoxFor(m => m.PriceValue, new { @class = "form-control", type = "number", min = "1", max = "5" })
+                                    @Html.ValidationMessageFor(m => m.PriceValue, "", new { @class = "text-danger small mt-1" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3 mt-2">
+                            <div class="custom-control custom-checkbox">
+                                @Html.CheckBoxFor(m => m.IsVerified, new { @class = "custom-control-input", id = "IsVerified" })
+                                <label class="custom-control-label" for="IsVerified">
+                                    Đánh dấu đã xác minh
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="text-muted small mb-4">
+                            Ngày tạo: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Lưu thay đổi
+                            </button>
+                            <a href="@Url.Action("RatingList", "AdminVet", new { Area = "Admin", clinicId = ViewBag.ReturnClinicId, filter = ViewBag.ReturnFilter, page = ViewBag.ReturnPage })"
+                               class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+    }
+</style>

@@ -1,0 +1,51 @@
+@model PagedList.IPagedList<WebTH.Models.EF.Product>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+}
+
+<div class="container" style="padding:40px 15px;">
+    <h2 style="margin-bottom:25px;">Danh sách sản phẩm</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                var img = item.ProductImage.FirstOrDefault(x => x.IsDefault) ?? item.ProductImage.FirstOrDefault();
+                var strImage = img != null ? img.Image : "/Content/assets/images/no-image.jpg";
+
+                <div class="col-md-3 col-sm-6" style="margin-bottom:20px;">
+                    <div style="border:1px solid #eee; padding:12px; border-radius:8px; height:100%;">
+                        <a href="/chi-tiet/@item.Alias-p@(item.Id)">
+                            <img src="@strImage" alt="@item.Title" style="width:100%; height:200px; object-fit:contain;" />
+                        </a>
+                        <h4 style="font-size:15px; margin:12px 0 8px;">
+                            <a href="/chi-tiet/@item.Alias-p@(item.Id)" style="color:#222;">@item.Title</a>
+                        </h4>
+                        <div>
+                            @if (item.PriceSale > 0)
+                            {
+                                <strong style="color:#fe4c50;">@WebTH.Common.Common.FormatNumber(item.PriceSale, 0) đ</strong>
+                                <span style="text-decoration:line-through; color:#999; margin-left:8px;">@WebTH.Common.Common.FormatNumber(item.Price, 0) đ</span>
+                            }
+                            else
+                            {
+                                <strong style="color:#fe4c50;">@WebTH.Common.Common.FormatNumber(item.Price, 0) đ</strong>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div style="text-align:center; margin-top:10px;">
+            @Html.PagedListPager(Model, page => Url.Action("Index", "ProductList", new { page }))
+        </div>
+    }
+    else
+    {
+        <p>Không có sản phẩm để hiển thị.</p>
+    }
+</div>

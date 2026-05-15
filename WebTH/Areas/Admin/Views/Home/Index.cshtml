@@ -1,0 +1,746 @@
+﻿@using System.Linq
+@model WebTH.Models.MarketingDashboardViewModel
+
+@{
+    ViewBag.Title = "Trung tâm Marketing Intelligence";
+    var monthProgress = Model.RevenueTarget > 0m ? Math.Min((Model.RevenueThisMonth / Model.RevenueTarget) * 100m, 100m) : 0m;
+    var leadBase = Math.Max(Model.LeadsThisMonth, 1);
+    var qualifyRate = Math.Min((Model.QualifiedLeadsThisMonth * 100m) / leadBase, 100m);
+    var convertRate = Model.QualifiedLeadsThisMonth > 0 ? Math.Min((Model.ConvertedOrdersThisMonth * 100m) / Model.QualifiedLeadsThisMonth, 100m) : 0m;
+    var newCustomerShare = Model.ActiveCustomers30Days > 0 ? Math.Min((Model.NewCustomers30Days * 100m) / Model.ActiveCustomers30Days, 100m) : 0m;
+    var conservativeForecast = Model.ForecastNextMonth * 0.88m;
+    var aggressiveForecast = Model.ForecastNextMonth * 1.16m;
+}
+
+@section naviheader {
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Marketing Intelligence</a>
+        </li>
+    </ul>
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap');
+
+    .marketing-dashboard {
+        --mk-bg: #f2f6fb;
+        --mk-card: #ffffff;
+        --mk-primary: #0a4fa3;
+        --mk-secondary: #17a2b8;
+        --mk-accent: #ff8a3d;
+        --mk-text: #1b2a42;
+        --mk-muted: #6a7891;
+        --mk-border: #d9e3f3;
+        font-family: 'Manrope', 'Source Sans Pro', sans-serif;
+        background: radial-gradient(circle at 10% 0%, #dcebff 0%, transparent 40%), radial-gradient(circle at 90% 20%, #d4f5ff 0%, transparent 32%), var(--mk-bg);
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 30px;
+    }
+
+    .mk-hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(120deg, #0f2a56 0%, #0a4fa3 48%, #167f9a 100%);
+        border-radius: 16px;
+        color: #fff;
+        padding: 24px 26px;
+        box-shadow: 0 18px 35px rgba(12, 43, 90, 0.22);
+        margin-bottom: 18px;
+    }
+
+    .mk-hero::before {
+        content: "";
+        position: absolute;
+        right: -40px;
+        top: -30px;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.14);
+    }
+
+    .mk-hero::after {
+        content: "";
+        position: absolute;
+        right: 90px;
+        bottom: -65px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mk-hero h2 {
+        margin: 0 0 8px;
+        font-size: 27px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+    }
+
+    .mk-hero p {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .mk-hero-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: end;
+        position: relative;
+        z-index: 1;
+    }
+
+    .mk-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .mk-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .mk-card {
+        background: var(--mk-card);
+        border: 1px solid var(--mk-border);
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 10px 24px rgba(20, 47, 88, 0.06);
+        animation: riseUp .5s ease forwards;
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    .mk-kpi-grid .mk-card:nth-child(1) {
+        animation-delay: .04s;
+    }
+
+    .mk-kpi-grid .mk-card:nth-child(2) {
+        animation-delay: .08s;
+    }
+
+    .mk-kpi-grid .mk-card:nth-child(3) {
+        animation-delay: .12s;
+    }
+
+    .mk-kpi-grid .mk-card:nth-child(4) {
+        animation-delay: .16s;
+    }
+
+    @@keyframes riseUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .mk-kpi-title {
+        font-size: 12px;
+        color: var(--mk-muted);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .mk-kpi-value {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--mk-text);
+        margin-bottom: 8px;
+    }
+
+    .mk-kpi-sub {
+        font-size: 12px;
+        color: var(--mk-muted);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .mk-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .mk-dot.green {
+        background: #2dbb74;
+    }
+
+    .mk-dot.blue {
+        background: #1d88ff;
+    }
+
+    .mk-dot.orange {
+        background: #ff8a3d;
+    }
+
+    .mk-dot.cyan {
+        background: #17a2b8;
+    }
+
+    .mk-main-grid {
+        display: grid;
+        grid-template-columns: 1.3fr .9fr;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .mk-card h3 {
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--mk-text);
+        margin: 0 0 12px;
+    }
+
+    .mk-strategy-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 9px;
+    }
+
+    .mk-strategy-list li {
+        background: #f7fbff;
+        border: 1px solid #dae8fb;
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mk-tag {
+        font-size: 11px;
+        font-weight: 800;
+        border-radius: 999px;
+        padding: 4px 9px;
+    }
+
+    .mk-tag.high {
+        color: #a55218;
+        background: #ffe3cf;
+    }
+
+    .mk-tag.mid {
+        color: #0f558f;
+        background: #d9ecff;
+    }
+
+    .mk-funnel {
+        display: grid;
+        gap: 11px;
+    }
+
+    .mk-funnel-step {
+        border: 1px solid #dce7f4;
+        border-radius: 10px;
+        padding: 8px 10px;
+        background: #f9fcff;
+    }
+
+    .mk-funnel-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 6px;
+        color: #2a3b58;
+        font-weight: 700;
+    }
+
+    .mk-progress {
+        height: 8px;
+        border-radius: 999px;
+        background: #e8eff9;
+        overflow: hidden;
+    }
+
+    .mk-progress > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #2c7dff, #14a7ba);
+    }
+
+    .mk-scenario-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .mk-scenario {
+        border-radius: 10px;
+        border: 1px solid #d6e5f9;
+        background: #f8fbff;
+        padding: 10px;
+    }
+
+    .mk-scenario .name {
+        font-size: 11px;
+        color: #5d6f8f;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .mk-scenario .value {
+        margin-top: 4px;
+        font-size: 18px;
+        font-weight: 800;
+        color: #123a70;
+    }
+
+    .mk-charts-grid {
+        display: grid;
+        grid-template-columns: 1.2fr .8fr;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .mk-chart-wrap {
+        height: 260px;
+    }
+
+    .mk-bottom-grid {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 12px;
+    }
+
+    .mk-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .mk-table th {
+        border-top: 0;
+        color: #5e6e89;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+
+    .mk-table td {
+        vertical-align: middle;
+        font-size: 13px;
+        color: #24354f;
+    }
+
+    .mk-mini-score {
+        width: 100px;
+    }
+
+    .mk-mini-score .mk-progress {
+        height: 6px;
+    }
+
+    .mk-category-list {
+        display: grid;
+        gap: 10px;
+    }
+
+    .mk-category-item {
+        border: 1px solid #d8e5f7;
+        border-radius: 11px;
+        background: #f8fbff;
+        padding: 10px 12px;
+    }
+
+    .mk-category-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: #24406a;
+    }
+
+    .mk-growth {
+        font-size: 11px;
+        font-weight: 800;
+        border-radius: 999px;
+        padding: 3px 8px;
+    }
+
+    .mk-growth.up {
+        background: #def8eb;
+        color: #1d8a53;
+    }
+
+    .mk-growth.down {
+        background: #ffe3df;
+        color: #bf4e3e;
+    }
+
+    @@media (max-width: 1199px) {
+        .mk-kpi-grid,
+        .mk-main-grid,
+        .mk-charts-grid,
+        .mk-bottom-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .mk-scenario-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .marketing-dashboard {
+            padding: 14px;
+            border-radius: 12px;
+        }
+
+        .mk-hero {
+            padding: 18px;
+        }
+
+        .mk-hero-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .mk-kpi-value {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Marketing Intelligence</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/home">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Marketing Intelligence</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="marketing-dashboard">
+        <div class="mk-hero">
+            <div class="mk-hero-grid">
+                <div>
+                    <h2>Marketing Direction Cockpit</h2>
+                    <p>Ưu tiên tăng trưởng theo dữ liệu SQL và tín hiệu tương lai, không chỉ nhìn số liệu quá khứ.</p>
+                    <p>Dữ liệu cập nhật lúc: <strong>@Model.SnapshotAt.ToString("dd/MM/yyyy HH:mm")</strong></p>
+                </div>
+                <div class="mk-pill">
+                    <i class="fas fa-satellite-dish"></i>
+                    Độ tin cậy dự báo: @Model.ForecastConfidence.ToString("N0")%
+                </div>
+            </div>
+        </div>
+
+        <div class="mk-kpi-grid">
+            <div class="mk-card">
+                <div class="mk-kpi-title">Doanh thu tháng này</div>
+                <div class="mk-kpi-value">@WebTH.Common.Common.FormatNumber(Model.RevenueThisMonth, 0) VND</div>
+                <div class="mk-kpi-sub">
+                    <span class="mk-dot green"></span>
+                    Tiến độ mục tiêu @monthProgress.ToString("N0")%
+                </div>
+            </div>
+            <div class="mk-card">
+                <div class="mk-kpi-title">Dự báo tháng tới</div>
+                <div class="mk-kpi-value">@WebTH.Common.Common.FormatNumber(Model.ForecastNextMonth, 0) VND</div>
+                <div class="mk-kpi-sub">
+                    <span class="mk-dot blue"></span>
+                    Mục tiêu: @WebTH.Common.Common.FormatNumber(Model.RevenueTarget, 0) VND
+                </div>
+            </div>
+            <div class="mk-card">
+                <div class="mk-kpi-title">Khách hoạt động (30 ngày)</div>
+                <div class="mk-kpi-value">@Model.ActiveCustomers30Days</div>
+                <div class="mk-kpi-sub">
+                    <span class="mk-dot cyan"></span>
+                    Khách mới: @Model.NewCustomers30Days
+                </div>
+            </div>
+            <div class="mk-card">
+                <div class="mk-kpi-title">Pipeline Coverage</div>
+                <div class="mk-kpi-value">@Model.PipelineCoverage.ToString("N0")%</div>
+                <div class="mk-kpi-sub">
+                    <span class="mk-dot orange"></span>
+                    Leads @Model.LeadsThisMonth / Qualified @Model.QualifiedLeadsThisMonth
+                </div>
+            </div>
+        </div>
+
+        <div class="mk-main-grid">
+            <div class="mk-card">
+                <h3>Định hướng chiến lược 90 ngày</h3>
+                <ul class="mk-strategy-list">
+                    @foreach (var action in Model.ActionPlaybook.Take(3))
+                    {
+                        <li>
+                            <div>
+                                <div><strong>@action.Objective</strong></div>
+                                <div style="font-size:12px;color:#637493;margin-top:3px;">Phụ trách: @action.Owner | Mốc: @action.Horizon</div>
+                            </div>
+                            <span class="mk-tag @(action.Priority == "Cao" ? "high" : "mid")">@action.Priority</span>
+                        </li>
+                    }
+                </ul>
+
+                <div class="mk-scenario-grid">
+                    <div class="mk-scenario">
+                        <div class="name">Kịch bản thận trọng</div>
+                        <div class="value">@WebTH.Common.Common.FormatNumber(conservativeForecast, 0) VND</div>
+                    </div>
+                    <div class="mk-scenario">
+                        <div class="name">Kịch bản cơ sở</div>
+                        <div class="value">@WebTH.Common.Common.FormatNumber(Model.ForecastNextMonth, 0) VND</div>
+                    </div>
+                    <div class="mk-scenario">
+                        <div class="name">Kịch bản bứt phá</div>
+                        <div class="value">@WebTH.Common.Common.FormatNumber(aggressiveForecast, 0) VND</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mk-card">
+                <h3>Funnel chuyển đổi</h3>
+                <div class="mk-funnel">
+                    <div class="mk-funnel-step">
+                        <div class="mk-funnel-head"><span>Lead tổng</span><span>@Model.LeadsThisMonth</span></div>
+                        <div class="mk-progress"><span style="width:100%"></span></div>
+                    </div>
+                    <div class="mk-funnel-step">
+                        <div class="mk-funnel-head"><span>Lead đủ điều kiện</span><span>@Model.QualifiedLeadsThisMonth (@qualifyRate.ToString("N0")%)</span></div>
+                        <div class="mk-progress"><span style="width:@qualifyRate.ToString("N0")%"></span></div>
+                    </div>
+                    <div class="mk-funnel-step">
+                        <div class="mk-funnel-head"><span>Đơn chuyển đổi</span><span>@Model.ConvertedOrdersThisMonth (@convertRate.ToString("N0")%)</span></div>
+                        <div class="mk-progress"><span style="width:@convertRate.ToString("N0")%"></span></div>
+                    </div>
+                    <div class="mk-funnel-step">
+                        <div class="mk-funnel-head"><span>Tỷ trọng khách mới</span><span>@newCustomerShare.ToString("N0")%</span></div>
+                        <div class="mk-progress"><span style="width:@newCustomerShare.ToString("N0")%"></span></div>
+                    </div>
+                    <div class="mk-funnel-step">
+                        <div class="mk-funnel-head"><span>Giữ chân khách</span><span>@Model.RetentionRate.ToString("N0")%</span></div>
+                        <div class="mk-progress"><span style="width:@Model.RetentionRate.ToString("N0")%"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mk-charts-grid">
+            <div class="mk-card">
+                <h3>Động lượng doanh thu (6 tháng)</h3>
+                <div class="mk-chart-wrap">
+                    <canvas id="mkTrendChart"></canvas>
+                </div>
+            </div>
+            <div class="mk-card">
+                <h3>Điểm động lượng danh mục</h3>
+                <div class="mk-chart-wrap">
+                    <canvas id="mkMomentumChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="mk-bottom-grid">
+            <div class="mk-card">
+                <h3>Tín hiệu tăng trưởng </h3>
+                <table class="table mk-table">
+                    <thead>
+                        <tr>
+                            <th>Nguồn tín hiệu</th>
+                            <th>Số lượng</th>
+                            <th>Tỷ trọng</th>
+                            <th>Tỷ lệ quy đổi</th>
+                            <th>Doanh thu phân bổ</th>
+                            <th>Điểm ưu tiên</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var channel in Model.ChannelFocus)
+                        {
+                            <tr>
+                                <td><strong>@channel.Channel</strong></td>
+                                <td>@channel.SignalCount</td>
+                                <td>@channel.ContributionPercent.ToString("N1")%</td>
+                                <td>@channel.ConversionRate.ToString("N1")%</td>
+                                <td>@WebTH.Common.Common.FormatNumber(channel.ProjectedRevenue, 0) VND</td>
+                                <td class="mk-mini-score">
+                                    <div class="mk-progress"><span style="width:@channel.PotentialScore.ToString("N0")%"></span></div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mk-card">
+                <h3>Danh mục có quán tính tăng trưởng</h3>
+                <div class="mk-category-list">
+                    @foreach (var category in Model.CategoryMomentum)
+                    {
+                        var growthUp = category.GrowthPercent >= 0m;
+                        <div class="mk-category-item">
+                            <div class="mk-category-head">
+                                <strong>@category.Category</strong>
+                                <span class="mk-growth @(growthUp ? "up" : "down")">
+                                    @(growthUp ? "+" : "")@category.GrowthPercent.ToString("N1")%
+                                </span>
+                            </div>
+                            <div style="font-size:12px;color:#5c6f8e;margin-bottom:7px;">
+                                Doanh thu: @WebTH.Common.Common.FormatNumber(category.Revenue, 0) VND
+                            </div>
+                            <div class="mk-progress"><span style="width:@category.MomentumScore.ToString("N0")%"></span></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/Content/assets/plugins/chart.js/Chart.min.js"></script>
+    <script>
+        (function () {
+            if (typeof Chart === 'undefined') {
+                return;
+            }
+
+            var trendLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueTrend.Select(x => x.MonthLabel).ToList()));
+            var trendValues = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueTrend.Select(x => x.Revenue).ToList()));
+            var trendOrders = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueTrend.Select(x => x.Orders).ToList()));
+            var targetValues = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueTrend.Select(x => Model.RevenueTarget).ToList()));
+
+            var momentumLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.CategoryMomentum.Select(x => x.Category).ToList()));
+            var momentumValues = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.CategoryMomentum.Select(x => x.MomentumScore).ToList()));
+
+            var trendCtx = document.getElementById('mkTrendChart');
+            if (trendCtx) {
+                new Chart(trendCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: trendLabels,
+                        datasets: [
+                            {
+                                label: 'Doanh thu',
+                                data: trendValues,
+                                yAxisID: 'yAxisRevenue',
+                                borderColor: '#1d88ff',
+                                backgroundColor: 'rgba(29, 136, 255, .16)',
+                                borderWidth: 2,
+                                lineTension: .3,
+                                fill: true
+                            },
+                            {
+                                label: 'Đơn hàng',
+                                data: trendOrders,
+                                yAxisID: 'yAxisOrder',
+                                borderColor: '#17a2b8',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                lineTension: .3,
+                                fill: false
+                            },
+                            {
+                                label: 'Mục tiêu',
+                                data: targetValues,
+                                yAxisID: 'yAxisRevenue',
+                                borderColor: '#ff8a3d',
+                                backgroundColor: 'transparent',
+                                borderDash: [6, 4],
+                                borderWidth: 2,
+                                lineTension: 0,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            position: 'bottom'
+                        },
+                        scales: {
+                            xAxes: [{
+                                gridLines: { display: false }
+                            }],
+                            yAxes: [
+                                {
+                                    id: 'yAxisRevenue',
+                                    position: 'left',
+                                    ticks: { beginAtZero: true }
+                                },
+                                {
+                                    id: 'yAxisOrder',
+                                    position: 'right',
+                                    ticks: { beginAtZero: true },
+                                    gridLines: { drawOnChartArea: false }
+                                }
+                            ]
+                        }
+                    }
+                });
+            }
+
+            var momentumCtx = document.getElementById('mkMomentumChart');
+            if (momentumCtx) {
+                new Chart(momentumCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: momentumLabels,
+                        datasets: [{
+                            label: 'Điểm động lượng',
+                            data: momentumValues,
+                            backgroundColor: ['#1d88ff', '#17a2b8', '#45b97c', '#ffae3d', '#ff7b54'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    max: 100
+                                }
+                            }],
+                            xAxes: [{
+                                gridLines: { display: false }
+                            }]
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+}

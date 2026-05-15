@@ -1,0 +1,212 @@
+/* ====================================================
+   HOME BOOTSTRAP POLISH
+   Scope: only <body class="home-bootstrap-pro">
+   ==================================================== */
+
+.home-bootstrap-pro {
+    background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 260px);
+    color: #16324f;
+}
+
+.home-bootstrap-pro .container {
+    max-width: 1200px;
+}
+
+.home-bootstrap-pro .wrap-menu-header {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-bottom: 1px solid #d9e5f5;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 20px rgba(22, 50, 79, 0.08);
+}
+
+.home-bootstrap-pro .wrap_header {
+    min-height: 78px;
+}
+
+.home-bootstrap-pro .main_menu > li > a {
+    color: #244769 !important;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    transition: all .25s ease;
+}
+
+.home-bootstrap-pro .main_menu > li > a:hover {
+    background: #e8f1ff;
+    color: #0f5bb3 !important;
+}
+
+.home-bootstrap-pro .navbar_user .account > a,
+.home-bootstrap-pro .navbar_user .checkout > a {
+    background: #eef5ff !important;
+    border: 1px solid #d5e4fb;
+    border-radius: 999px;
+    color: #1a4d87;
+    width: 44px;
+    height: 44px;
+    line-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .25s ease;
+}
+
+.home-bootstrap-pro .navbar_user .account > a:hover,
+.home-bootstrap-pro .navbar_user .checkout > a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(26, 77, 135, 0.18);
+}
+
+.home-bootstrap-pro .checkout_items {
+    background: #0f5bb3;
+}
+
+.home-bootstrap-pro .item-slick1 {
+    border-radius: 0 0 24px 24px;
+}
+
+.home-bootstrap-pro .wrap-content-slide1 {
+    gap: 16px;
+}
+
+.home-bootstrap-pro .caption2-slide1 {
+    background: rgba(13, 37, 63, 0.34);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 26px 30px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+}
+
+.home-bootstrap-pro .caption2-slide1 .tit11 {
+    line-height: 1.18;
+}
+
+.home-bootstrap-pro .caption2-slide1 .tit12 {
+    color: rgba(255, 255, 255, 0.96);
+}
+
+.home-bootstrap-pro .btn1,
+.home-bootstrap-pro .btn2 {
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+    border: none !important;
+    letter-spacing: .2px;
+    box-shadow: 0 8px 22px rgba(14, 79, 153, 0.28);
+    background: linear-gradient(135deg, #0f5bb3 0%, #1a8bb8 100%) !important;
+}
+
+.home-bootstrap-pro .btn1:hover,
+.home-bootstrap-pro .btn2:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(14, 79, 153, 0.38);
+}
+
+.home-bootstrap-pro .section-welcome,
+.home-bootstrap-pro .section-review,
+.home-bootstrap-pro .section-event {
+    padding-top: 92px !important;
+    padding-bottom: 92px !important;
+}
+
+.home-bootstrap-pro .wrap-text-welcome {
+    border: 1px solid #e0e9f5;
+    box-shadow: 0 14px 38px rgba(17, 44, 75, 0.1);
+}
+
+.home-bootstrap-pro .item-ourmenu,
+.home-bootstrap-pro .item-gallery,
+.home-bootstrap-pro .item-slick3,
+.home-bootstrap-pro .blo2 {
+    border: 1px solid #e1e9f6;
+    box-shadow: 0 10px 30px rgba(25, 54, 89, 0.1) !important;
+    border-radius: 16px !important;
+}
+
+.home-bootstrap-pro .item-ourmenu:hover,
+.home-bootstrap-pro .item-gallery:hover,
+.home-bootstrap-pro .item-slick3:hover,
+.home-bootstrap-pro .blo2:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(25, 54, 89, 0.16) !important;
+}
+
+.home-bootstrap-pro .title-event,
+.home-bootstrap-pro .title-review {
+    margin-bottom: 56px;
+}
+
+.home-bootstrap-pro .tit2-copy,
+.home-bootstrap-pro .tit2-copy-2 {
+    color: #0f5bb3 !important;
+    letter-spacing: 1.6px;
+}
+
+.home-bootstrap-pro .tit6,
+.home-bootstrap-pro .tit8 {
+    color: #1d3553 !important;
+    font-weight: 800 !important;
+}
+
+.home-bootstrap-pro .size11 {
+    background: linear-gradient(135deg, #0f5bb3 0%, #1a8bb8 100%) !important;
+    border-radius: 12px;
+}
+
+.home-bootstrap-pro .section-video::before {
+    background: linear-gradient(180deg, rgba(9, 25, 48, 0.5) 0%, rgba(9, 25, 48, 0.58) 100%);
+}
+
+.home-bootstrap-pro .content-video .tit4 {
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+}
+
+.home-bootstrap-pro .bg1 {
+    background: linear-gradient(180deg, #173557 0%, #112841 100%) !important;
+}
+
+.home-bootstrap-pro .end-footer.bg2 {
+    background: #0d2033 !important;
+}
+
+.home-bootstrap-pro footer .txt13,
+.home-bootstrap-pro footer .txt14,
+.home-bootstrap-pro footer .txt15,
+.home-bootstrap-pro footer .txt17 {
+    color: #e7effb !important;
+}
+
+.home-bootstrap-pro #chat-toggle-btn {
+    background: linear-gradient(135deg, #0f5bb3 0%, #1a8bb8 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 10px 24px rgba(14, 79, 153, 0.35) !important;
+}
+
+.home-bootstrap-pro .widget-header {
+    background: linear-gradient(135deg, #0f5bb3 0%, #1a8bb8 100%) !important;
+}
+
+@media (max-width: 991px) {
+    .home-bootstrap-pro .caption2-slide1 {
+        width: 100% !important;
+        padding: 20px 18px;
+    }
+
+    .home-bootstrap-pro .section-welcome,
+    .home-bootstrap-pro .section-review,
+    .home-bootstrap-pro .section-event {
+        padding-top: 70px !important;
+        padding-bottom: 70px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .home-bootstrap-pro .main_menu > li > a {
+        padding: 8px 12px;
+    }
+
+    .home-bootstrap-pro .item-slick1 {
+        border-radius: 0 0 16px 16px;
+    }
+}

@@ -1,0 +1,117 @@
+﻿@model WebTH.Models.EF.Order
+@using WebTH.Common
+
+@{
+    var statusText = "Hoan thanh";
+    var statusClass = "label-default";
+    var paymentText = "Khong xac dinh";
+
+    if (Model.Status == 1)
+    {
+        statusText = "Cho thanh toan";
+        statusClass = "label-warning";
+    }
+    else if (Model.Status == 2)
+    {
+        statusText = "Da thanh toan";
+        statusClass = "label-info";
+    }
+    else if (Model.Status == 3)
+    {
+        statusText = "Dang giao hang";
+        statusClass = "label-success";
+    }
+
+    if (Model.TypePayment == 1)
+    {
+        paymentText = "COD - Thanh toan khi nhan hang";
+    }
+    else if (Model.TypePayment == 2)
+    {
+        paymentText = "Chuyen khoan truc tuyen";
+    }
+}
+
+<div style="padding: 4px 2px;">
+    <div class="row" style="margin-bottom: 16px;">
+        <div class="col-sm-6">
+            <h5 style="margin-top: 0; font-weight: 700; color: #1f2937;">
+                <i class="fa fa-user-circle-o"></i> Thong tin nhan hang
+            </h5>
+            <p style="margin-bottom: 6px;"><strong>Khach hang:</strong> @Model.CustomerName</p>
+            <p style="margin-bottom: 6px;"><strong>Dien thoai:</strong> @Model.Phone</p>
+            <p style="margin-bottom: 6px;"><strong>Email:</strong> @(string.IsNullOrWhiteSpace(Model.Email) ? "Khong co" : Model.Email)</p>
+            <p style="margin-bottom: 0;"><strong>Dia chi:</strong> @Model.Address</p>
+        </div>
+        <div class="col-sm-6">
+            <h5 style="margin-top: 0; font-weight: 700; color: #1f2937;">
+                <i class="fa fa-file-text-o"></i> Thong tin don hang
+            </h5>
+            <p style="margin-bottom: 6px;"><strong>Ma don:</strong> <span style="font-family: 'Courier New', monospace;">@Model.Code</span></p>
+            <p style="margin-bottom: 6px;"><strong>Ngay dat:</strong> @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+            <p style="margin-bottom: 6px;"><strong>Thanh toan:</strong> @paymentText</p>
+            <p style="margin-bottom: 0;">
+                <strong>Trang thai:</strong>
+                <span class="label @statusClass">@statusText</span>
+            </p>
+        </div>
+    </div>
+
+    <div style="border-top: 1px solid #e5e7eb; padding-top: 14px;">
+        <h5 style="margin-top: 0; font-weight: 700; color: #1f2937; margin-bottom: 12px;">
+            <i class="fa fa-shopping-basket"></i> San pham trong don
+        </h5>
+
+        @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" style="margin-bottom: 12px;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th style="width: 42%;">San pham</th>
+                            <th style="width: 14%; text-align: right;">So luong</th>
+                            <th style="width: 22%; text-align: right;">Don gia</th>
+                            <th style="width: 22%; text-align: right;">Thanh tien</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.OrderDetails)
+                        {
+                            var lineTotal = detail.Price * detail.Quantity;
+                            var productName = detail.Product != null ? detail.Product.Title : ("San pham #" + detail.ProductId);
+                            var productUrl = "/Products/Detail/" + detail.ProductId;
+
+                            if (detail.Product != null && !string.IsNullOrWhiteSpace(detail.Product.Alias))
+                            {
+                                productUrl = "/chi-tiet/" + detail.Product.Alias + "-p" + detail.Product.Id;
+                            }
+
+                            <tr>
+                                <td>
+                                    <a href="@productUrl" target="_blank" style="font-weight: 600; color: #1f2937;">
+                                        @productName
+                                    </a>
+                                </td>
+                                <td style="text-align: right;">@detail.Quantity</td>
+                                <td style="text-align: right;">@Common.FormatNumber(detail.Price, 0) VND</td>
+                                <td style="text-align: right; font-weight: 700;">@Common.FormatNumber(lineTotal, 0) VND</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning" style="margin-bottom: 10px;">
+                Khong co chi tiet san pham trong don hang nay.
+            </div>
+        }
+    </div>
+
+    <div style="border-top: 1px dashed #d1d5db; padding-top: 14px; margin-top: 8px; text-align: right;">
+        <div style="font-size: 18px; font-weight: 800; color: #0f766e;">
+            Tong thanh toan: @Common.FormatNumber(Model.TotalAmount, 0) VND
+        </div>
+    </div>
+</div>

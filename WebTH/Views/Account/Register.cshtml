@@ -1,0 +1,308 @@
+﻿@model WebTH.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Đăng ký";
+}
+
+<style>
+    /* Register Page Styles */
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .auth-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        align-items: center;
+    }
+
+    .auth-left {
+        padding: 60px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-left h1 {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .auth-left p {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
+
+    .benefits-list {
+        gap: 20px;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .benefit-item i {
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .benefit-item span {
+        font-size: 14px;
+    }
+
+    .auth-right {
+        padding: 60px;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-form {
+        max-width: 400px;
+       
+       
+    }
+
+    .auth-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 10px;
+    }
+
+    .auth-subtitle {
+        font-size: 14px;
+        color: #999;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="email"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .password-requirements {
+        font-size: 12px;
+        color: #999;
+        margin-top: 8px;
+        background: #f9f9f9;
+        padding: 12px;
+        border-radius: 4px;
+        line-height: 1.5;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        margin: 25px 0 15px 0;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .validation-error {
+        color: #ff6b6b;
+        font-size: 12px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .error-message {
+        background: #ffe0e0;
+        color: #cc0000;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        border-left: 4px solid #cc0000;
+    }
+
+    .login-link {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
+    }
+
+    .login-link a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .terms-agreement {
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+        line-height: 1.5;
+        margin-top: 15px;
+    }
+
+    .terms-agreement a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    @@media (max-width: 1024px) {
+        .auth-content {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-left {
+            display: none;
+        }
+
+        .auth-right {
+            padding: 40px 20px;
+            border-radius: 12px;
+            max-width: 100%;
+        }
+    }
+</style>
+
+<section class="auth-container">
+    <div class="auth-content">
+        <!-- Left Side - Brand Info -->
+        <div class="auth-left">
+            <h1>Tham gia PetFood</h1>
+            <p style="color:white;">Tạo tài khoản để bắt đầu mua sắm các sản phẩm thức ăn chất lượng cao cho thú cưng của bạn.</p>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <i class="fa fa-star"></i>
+                    <span>Ưu đãi độc quyền cho thành viên mới</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fa fa-truck"></i>
+                    <span>Giao hàng miễn phí cho đơn hàng từ 500k</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fa fa-heart"></i>
+                    <span>Lưu sản phẩm yêu thích để mua lại</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fa fa-history"></i>
+                    <span>Theo dõi lịch sử mua hàng của bạn</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Registration Form -->
+        <div class="auth-right">
+            <div class="auth-form">
+                <h2 class="auth-title">Đăng ký</h2>
+                <p class="auth-subtitle">Tạo tài khoản mới để tiếp tục</p>
+
+                @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    
+                    if (!ViewData.ModelState.IsValid && ViewData.ModelState.Any(m => m.Value.Errors.Count > 0))
+                    {
+                        <div class="error-message">
+                            <i class="fa fa-times-circle"></i> Vui lòng kiểm tra lại thông tin đăng ký.
+                        </div>
+                    }
+
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email, "Địa chỉ Email")
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Nhập địa chỉ email của bạn", type = "email" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "validation-error" })
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password, "Mật khẩu")
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "validation-error" })
+                        <div class="password-requirements">
+                            <strong>Yêu cầu mật khẩu:</strong><br/>
+                            • Ít nhất 6 ký tự<br/>
+                            • Ít nhất 1 chữ hoa và 1 chữ thường<br/>
+                            • Ít nhất 1 số
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ConfirmPassword, "Xác nhận mật khẩu")
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Nhập lại mật khẩu" })
+                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "validation-error" })
+                    </div>
+
+                    <!-- Submit Button -->
+                    <input type="submit" class="submit-btn" value="Tạo tài khoản" />
+
+                    <!-- Terms Agreement -->
+                    <div class="terms-agreement">
+                        Bằng cách tạo tài khoản, bạn đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a> của chúng tôi.
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="login-link">
+                        Đã có tài khoản? <a href="@Url.Action("Login", "Account")">Đăng nhập ngay</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

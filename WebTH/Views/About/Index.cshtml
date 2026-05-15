@@ -1,0 +1,627 @@
+﻿
+@{
+    ViewBag.Title = "Thông tin về chúng tôi";
+}
+
+<style>
+    .about-page {
+        overflow-x: hidden;
+    }
+
+    /* Hero Section */
+    .hero-about {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 200px 15px 100px;
+        color: white;
+        text-align: center;
+    }
+
+        .hero-about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url(/Content/assets/images/bg-title-page-3.jpg);
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .hero-about h2 {
+            position: relative;
+            z-index: 2;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-about p {
+            position: relative;
+            z-index: 2;
+            font-size: 1.2rem;
+            color: white;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+    /* Story Section */
+    .story-section {
+        padding: 100px 15px;
+        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    .story-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+        .story-header .subtitle {
+            color: #667eea;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .story-header h3 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+    .story-content {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+        line-height: 1.8;
+        color: #555;
+        font-size: 1.05rem;
+    }
+
+    /* Values Section */
+    .values-section {
+        padding: 100px 15px;
+        background: white;
+    }
+
+    .values-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+        .values-header .subtitle {
+            color: #667eea;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .values-header h3 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+    .value-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 35px;
+        border-radius: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        margin-bottom: 30px;
+    }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .value-card i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .value-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .value-card p {
+            font-size: 0.95rem;
+            color: white;
+            opacity: 0.95;
+        }
+
+    /* Process Section */
+    .process-section {
+        padding: 100px 15px;
+        background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+    }
+
+    .process-title {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+        .process-title .subtitle {
+            color: #667eea;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .process-title h3 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+    .process-item {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+    }
+
+        .process-item:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            transform: translateY(-5px);
+        }
+
+        .process-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .process-item:hover img {
+            transform: scale(1.05);
+        }
+
+    .process-content {
+        padding: 30px;
+    }
+
+        .process-content .subtitle {
+            color: #667eea;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .process-content h4 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .process-content p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+    /* Video Section */
+    .video-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 120px 15px;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        color: white;
+    }
+
+        .video-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url(/Content/assets/images/bg-cover-video-3.jpg);
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+        }
+
+    .video-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .video-section .subtitle {
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        opacity: 0.95;
+    }
+
+    .video-section h3 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 40px;
+    }
+
+    .play-button {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        margin: 0 auto;
+    }
+
+        .play-button:hover {
+            transform: scale(1.15);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .play-button i {
+            color: #667eea;
+            font-size: 2rem;
+            margin-left: 5px;
+        }
+
+    /* Team Section */
+    .team-section {
+        padding: 100px 15px;
+        background: white;
+    }
+
+    .team-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+        .team-header .subtitle {
+            color: #667eea;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .team-header h3 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+    .team-member {
+        text-align: justify;
+        transition: all 0.3s ease;
+    }
+
+    .member-avatar {
+        position: relative;
+        margin-bottom: 30px;
+        overflow: hidden;
+        border-radius: 15px;
+    }
+
+        .member-avatar img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+            border-radius: 15px;
+        }
+
+    .team-member:hover .member-avatar img {
+        transform: scale(1.1);
+    }
+
+    .member-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        margin-top: -5px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .member-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .member-role {
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        opacity: 0.9;
+    }
+
+    .member-bio {
+        font-size: 1rem;
+        line-height: 1.5;
+        opacity: 0.95;
+        color:white;
+        min-height:150px;
+    }
+
+    .team-member:hover .member-info {
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 80px 15px;
+        color: white;
+        text-align: center;
+    }
+
+    .stat-item {
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-about">
+    <h2>Về Chúng Tôi</h2>
+    <p>Khám phá câu chuyện, giá trị và sứ mệnh của PetFood</p>
+</section>
+
+<!-- Story Section -->
+<section class="story-section">
+    <div class="container">
+        <div class="story-header">
+            <span class="subtitle">PetFood - Tình yêu thú cưng</span>
+            <h3>Câu chuyện của chúng tôi</h3>
+        </div>
+        <div class="story-content">
+            <p>
+                Mọi câu chuyện đều có một khởi đầu. Với PetFood, chúng tôi bắt đầu câu chuyện của mình từ một niềm đام mê giản dị - yêu thương thú cưng và mong muốn chúng sống khỏe mạnh. Chúng tôi hiểu rằng thú cưng không chỉ là một vật nuôi, mà là một thành viên trong gia đình. Chính vì lẽ đó, chúng tôi khát khao mang đến những sản phẩm dinh dưỡng tốt nhất cho các bạn không có lông.
+            </p>
+            <p style="margin-top: 20px;">
+                Sức khỏe của thú cưng là ưu tiên hàng đầu của chúng tôi. Chúng tôi tin rằng một thú cưng khỏe mạnh sẽ mang lại niềm vui, sự bù đắp tinh thần và tình yêu vô bờ bến cho mỗi gia đình. Đó là lý do tại sao PetFood cam kết sử dụng chỉ những nguyên liệu tự nhiên, chất lượng cao nhất, được kiểm tra kỹ lưỡng và đáp ứng các tiêu chuẩn an toàn quốc tế. Mỗi sản phẩm của chúng tôi được phát triển dựa trên nghiên cứu dinh dưỡng của các chuyên gia hàng đầu.
+            </p>
+            <p style="margin-top: 20px;">
+                Với PetFood, sứ mệnh của chúng tôi rất rõ ràng - cung cấp những sản phẩm dinh dưỡng tối ưu cho thú cưng của bạn, giúp chúng phát triển toàn diện từ cơ thể cho đến tâm trí. Chúng tôi không chỉ bán sản phẩm, mà còn chia sẻ tình yêu, trách nhiệm và cam kết với mỗi gia đình có thú cưng tại Việt Nam. Đó là sứ mệnh cao đẹp của PetFood.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="values-section">
+    <div class="container">
+        <div class="values-header">
+            <span class="subtitle">Những Giá Trị</span>
+            <h3>Những Nguyên Tắc Hướng Dẫn Chúng Tôi</h3>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="value-card">
+                    <i class="fa fa-heart"></i>
+                    <h4>Tình Yêu</h4>
+                    <p>Yêu thương thú cưng như gia đình, đảm bảo sức khỏe tốt nhất cho chúng.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="value-card">
+                    <i class="fa fa-leaf"></i>
+                    <h4>Chất Lượng</h4>
+                    <p>Sử dụng nguyên liệu tự nhiên và tiêu chuẩn an toàn hàng đầu.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="value-card">
+                    <i class="fa fa-handshake-o"></i>
+                    <h4>Trách Nhiệm</h4>
+                    <p>Cam kết với mỗi khách hàng và xã hội phát triển bền vững.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Video Section -->
+<section class="video-section">
+    <div class="video-content">
+        <span class="subtitle">Khám phá</span>
+        <h3>Video của chúng tôi</h3>
+        <div class="play-button" data-toggle="modal" data-target="#modal-video-01">
+            <i class="fa fa-play"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section">
+    <div class="container">
+        <div class="process-title">
+            <span class="subtitle">Quy trình sản xuất</span>
+            <h3>Điều tạo nên sự khác biệt của PetFood</h3>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="process-item">
+                    <img src="~/Content/assets/images/our-story-1.jpg" alt="Quy trình sản xuất" />
+                    <div class="process-content">
+                        <span class="subtitle">Chất Lượng</span>
+                        <h4>Quy trình sản xuất</h4>
+                        <p>
+                            Quy trình sản xuất thức ăn thú cưng chất lượng cao từ nguồn nguyên liệu được chọn lọc và sản xuất theo tiêu chuẩn an toàn nghiêm ngặt. Chúng tôi kiểm tra từng bước để đảm bảo sản phẩm hoàn hảo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="process-item">
+                    <img src="~/Content/assets/images/our-story-2.jpg" alt="Trang trại" />
+                    <div class="process-content">
+                        <span class="subtitle">Trang Trại</span>
+                        <h4>PetFood Farm</h4>
+                        <p>
+                            Chúng tôi hợp tác với các nông trại và nhà cung cấp uy tín để đảm bảo nguyên liệu tươi sạch và an toàn cho sản phẩm thức ăn thú cưng. Mỗi nguyên liệu được kiểm tra kỹ lưỡng.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Khách hàng hài lòng</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Sản phẩm</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-item">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Năm kinh nghiệm</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">An toàn & Chất lượng</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+    <div class="container">
+        <div class="team-header">
+            <span class="subtitle">Gặp gỡ</span>
+            <h3>Các Nhà Lãnh Đạo Của Chúng Tôi</h3>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <img src="~/Content/assets/images/4205894.png" alt="Thái Hương" />
+                    </div>
+                    <div class="member-info">
+                        <div class="member-name">Thái Hương</div>
+                        <div class="member-role">Chủ Tịch & Sáng Lập Viên</div>
+                        <p class="member-bio">
+                            Nữ doanh nhân được biết đến là người phụ nữ có một bản lĩnh kiên định và một tấm lòng nhân hậu. Với niềm đam mê cải thiện sức khỏe cho thú cưng Việt.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <img src="~/Content/assets/images/4205894.png" alt="Giám Đốc Kỹ Thuật" />
+                    </div>
+                    <div class="member-info">
+                        <div class="member-name">Nguyễn Văn An</div>
+                        <div class="member-role">Giám Đốc Kỹ Thuật</div>
+                        <p class="member-bio">
+                            Chuyên gia hàng đầu trong lĩnh vực dinh dưỡng thú cưng với hơn 10 năm kinh nghiệm trong sản xuất thức ăn chất lượng cao.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <img src="~/Content/assets/images/4205894.png" alt="Giám Đốc Bán Hàng" />
+                    </div>
+                    <div class="member-info">
+                        <div class="member-name">Trần Thị Hoa</div>
+                        <div class="member-role">Giám Đốc Bán Hàng</div>
+                        <p class="member-bio">
+                            Chuyên gia marketing với đam mê phục vụ khách hàng tốt nhất. Cam kết mang sản phẩm tốt nhất đến với mọi gia đình.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="modal-video-01" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document" data-dismiss="modal">
+        <div class="close-mo-video-01 trans-0-4" data-dismiss="modal" aria-label="Close">
+            &times;
+        </div>
+        <div class="wrap-video-mo-01">
+            <div class="w-full wrap-pic-w op-0-0">
+                <img src="~/Content/assets/images/icons/video-16-9.jpg" alt="IMG" />
+            </div>
+            <div class="video-mo-01">
+                <iframe src="https://www.youtube.com/embed/f7aqTAZm3G8?si=KKp_TpUi9qA7eU42"
+                        allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript" src="vendor/isotope/isotope.pkgd.min.js"></script>
+}

@@ -1,0 +1,488 @@
+﻿@{
+    ViewBag.Title = "Thanh toán";
+}
+
+<style>
+    .checkout-pro {
+        margin-top: 42px;
+    }
+
+    .checkout-header {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .checkout-kicker {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: #eef4ff;
+        color: #2458b7;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .checkout-header h1 {
+        font-size: 46px;
+        font-weight: 800;
+        margin: 0 0 8px;
+        color: #1f2937;
+    }
+
+    .checkout-header p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 16px;
+    }
+
+    .checkout-row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .checkout-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08);
+        border: 1px solid #edf0f5;
+        padding: 28px;
+        margin-bottom: 20px;
+    }
+
+    .checkout-summary-wrapper {
+        position: sticky;
+        top: 105px;
+    }
+
+    .checkout-trust {
+        background: #f8fafc;
+        border: 1px dashed #d6e1f5;
+        border-radius: 14px;
+        padding: 16px 18px;
+        color: #374151;
+        line-height: 1.6;
+    }
+
+    .checkout-trust p {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1f2937;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+    }
+
+    .checkout-trust-item {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .checkout-trust-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .checkout-trust-item i {
+        color: #1c8f4b;
+        width: 18px;
+        margin-right: 4px;
+    }
+
+    .checkout-alert {
+        display: none;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .checkout-alert-error {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .checkout-form-head h3 {
+        margin: 0 0 4px;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .checkout-form-head p {
+        margin: 0 0 22px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .checkout-field {
+        margin-bottom: 16px;
+    }
+
+    .checkout-field > label {
+        display: block;
+        margin-bottom: 6px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .checkout-field .input-group-addon {
+        background: #f8fafc;
+        border-color: #dbe3ee;
+        color: #64748b;
+        min-width: 42px;
+    }
+
+    .checkout-field .form-control {
+        border-color: #dbe3ee;
+        height: 42px;
+        box-shadow: none;
+    }
+
+    .checkout-field .form-control:focus {
+        border-color: #6793e0;
+        box-shadow: 0 0 0 3px rgba(103, 147, 224, 0.12);
+    }
+
+    .checkout-field textarea.form-control {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .checkout-help {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .checkout-vnpay-options {
+        border: 1px solid #dbe3ee;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .checkout-vnpay-options h4 {
+        margin: 0 0 12px;
+        font-size: 15px;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .checkout-radio {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        cursor: pointer;
+        font-weight: 400;
+    }
+
+    .checkout-radio:last-child {
+        margin-bottom: 0;
+    }
+
+    .checkout-radio input {
+        margin-right: 8px;
+    }
+
+    .checkout-processing {
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: #eff6ff;
+        color: #1e3a8a;
+        border: 1px solid #bfdbfe;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .checkout-processing-success {
+        background: #ecfdf5;
+        color: #065f46;
+        border-color: #a7f3d0;
+    }
+
+    .checkout-processing-error {
+        background: #fef2f2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+
+    .checkout-submit {
+        border: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 15px;
+        font-weight: 700;
+        background: linear-gradient(90deg, #2563eb, #1d4ed8);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    }
+
+    .checkout-submit:hover,
+    .checkout-submit:focus {
+        color: #fff;
+        opacity: 0.95;
+    }
+
+    .checkout-terms {
+        margin-top: 10px;
+        margin-bottom: 0;
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .checkout-summary-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 14px;
+    }
+
+    .checkout-summary-head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .checkout-summary-head span {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f4f9;
+    }
+
+    .summary-product {
+        font-size: 13px;
+        color: #334155;
+    }
+
+    .summary-product strong {
+        display: block;
+        color: #1f2937;
+        margin-bottom: 3px;
+    }
+
+    .summary-product span {
+        color: #64748b;
+    }
+
+    .summary-price {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        white-space: nowrap;
+    }
+
+    .summary-metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 9px 0;
+        font-size: 14px;
+        color: #334155;
+    }
+
+    .summary-metric strong {
+        color: #111827;
+    }
+
+    .summary-grand {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .summary-grand span,
+    .summary-grand strong {
+        font-size: 17px;
+        color: #111827;
+        font-weight: 800;
+    }
+
+    .summary-note {
+        margin-top: 10px;
+        margin-bottom: 0;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .summary-note i {
+        margin-right: 4px;
+    }
+
+    .checkout-edit-cart {
+        border-radius: 8px;
+        font-weight: 600;
+        margin-top: 12px;
+    }
+
+    .checkout-empty {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 24px;
+        color: #374151;
+        font-size: 15px;
+        text-align: center;
+    }
+
+    .checkout-empty a {
+        font-weight: 700;
+    }
+
+    .error {
+        color: #dc2626;
+        font-size: 12px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .has-error .form-control,
+    .has-error .input-group-addon {
+        border-color: #fca5a5;
+    }
+
+    @@media (max-width: 991px) {
+        .checkout-summary-wrapper {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 767px) {
+        .checkout-pro {
+            margin-top: 28px;
+        }
+
+        .checkout-header h1 {
+            font-size: 34px;
+        }
+
+        .checkout-header p {
+            font-size: 14px;
+        }
+
+        .checkout-card {
+            padding: 20px;
+        }
+    }
+</style>
+
+<section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15"
+         style="background-image: url(/Content/assets/images/banner-trang-san-pham-tin-tuc-01-4.jpg)">
+    <h2 class="tit6 t-center">Thanh toán</h2>
+</section>
+
+<div class="container checkout-pro p-b-80 p-l-15 p-r-15" id="load_data">
+    <div class="checkout-header">
+        <span class="checkout-kicker">Thanh toán an toàn</span>
+        <h1>Hoàn tất đơn hàng</h1>
+        <p>Kiểm tra thông tin nhận hàng và phương thức thanh toán trước khi xác nhận.</p>
+    </div>
+
+    @if (ViewBag.CheckCart != null)
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="show_success" class="checkout-alert"></div>
+            </div>
+        </div>
+        <div class="row checkout-row">
+            <div class="col-md-8 col-sm-12">
+                <div class="checkout-card">
+                    @Html.Action("Partial_CheckOut", "Shoppingcart")
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 m-b-10">
+                <div class="checkout-card checkout-summary-wrapper">
+                    @Html.Action("Partial_Item_ThanhToan", "ShoppingCart")
+                </div>
+                <div class="checkout-trust">
+                    <p>Cam kết mua sắm</p>
+                    <div class="checkout-trust-item"><i class="fa fa-shield"></i> Bảo mật dữ liệu với SSL</div>
+                    <div class="checkout-trust-item"><i class="fa fa-truck"></i> Giao nhanh toàn quốc</div>
+                    <div class="checkout-trust-item"><i class="fa fa-refresh"></i> Hỗ trợ đổi trả theo chính sách</div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="checkout-empty">
+            Bạn chưa có sản phẩm nào. Vui lòng quay lại trang <a href="/san-pham"><u>Cửa hàng</u></a> để mua hàng.
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        function renderCheckoutError(message) {
+            $('#show_success')
+                .removeClass('checkout-alert-success')
+                .addClass('checkout-alert-error')
+                .text(message)
+                .fadeIn(150);
+        }
+
+        function OnFailure(rs) {
+            if (!rs || !rs.Success) {
+                renderCheckoutError("Đặt hàng thất bại. Vui lòng kiểm tra lại thông tin và thử lại.");
+            }
+        }
+
+        $(document).ready(function () {
+            $('body').on('change', '#drTypePayment', function () {
+                var type = $(this).val();
+                $('#load_form_payment').stop(true, true).slideUp(120);
+                if (type == "2") {
+                    $('#load_form_payment').stop(true, true).slideDown(120);
+                }
+            });
+
+            if ($('#drTypePayment').val() == "2") {
+                $('#load_form_payment').show();
+            }
+
+            $('#myForm').validate({
+                rules: {
+                    'CustomerName': {
+                        required: true
+                    },
+                    'Phone': {
+                        required: true
+                    },
+                    'Address': {
+                        required: true
+                    },
+                    'Email': {
+                        email: true
+                    }
+                },
+                messages: {
+                    'CustomerName': 'Bạn không được để trống trường này',
+                    'Phone': 'Bạn không được để trống trường này',
+                    'Address': 'Bạn không được để trống trường này',
+                    'Email': 'Email chưa hợp lệ'
+                },
+                highlight: function (element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+        });
+    </script>
+}

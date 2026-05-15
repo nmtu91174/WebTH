@@ -1,0 +1,179 @@
+﻿using PagedList;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using WebTH.Models;
+using WebTH.Models.EF;
+
+namespace WebTH.Areas.Admin.Controllers
+{
+    [Authorize(Roles = "Admin,Employee")]
+
+    public class ProductsController : Controller
+    {
+        ApplicationDbContext db = new ApplicationDbContext();
+
+        // GET: Admin/Products
+        public ActionResult Index(int? page)
+        {
+            IEnumerable<Product> items = db.Products.OrderByDescending(x => x.Id);
+            var pageSize = 10;
+            if (page == null)
+            {
+                page = 1;
+            }
+            var pageIndex = page.HasValue ? Convert.ToInt32(page) : 1;
+            items = items.ToPagedList(pageIndex, pageSize);
+            ViewBag.PageSize = pageSize;
+            ViewBag.Page = page;
+            return View(items);
+        }
+
+        public ActionResult Add()
+        {
+            ViewBag.ProductCategory = new SelectList(db.ProductCategories.ToList(), "Id", "Title");
+            ViewBag.Promotion = new SelectList(db.Promotions.ToList(), "Id", "Title");
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Add(Product model, List<string> Images, List<int> rDefault)
+        {
+            if (ModelState.IsValid)
+            {
+                model.CreatedDate = DateTime.Now;
+                model.ModifiedDate = DateTime.Now;
+                if (string.IsNullOrEmpty(model.SeoTitle))
+                {
+                    model.SeoTitle = model.Title;
+                }
+
+                if (string.IsNullOrEmpty(model.Alias))
+                    model.Alias = WebTH.Models.Common.Filter.FilterChar(model.Title);
+
+                // First save the product to ensure it has an Id
+                db.Products.Add(model);
+                db.SaveChanges();
+
+                // Determine selected default index safely
+                int defaultIndex = -1;
+                if (rDefault != null && rDefault.Count > 0)
+                {
+                    defaultIndex = rDefault[0];
+                }
+
+                // Add product images referencing the saved product Id
+                if (Images != null && Images.Count > 0)
+                {
+                    for (int i = 0; i < Images.Count; i++)
+                    {
+                        bool isDefault = (defaultIndex > 0 && i + 1 == defaultIndex);
+                        var pi = new ProductImage
+                        {
+                            ProductId = model.Id,
+                            Image = Images[i],
+                            IsDefault = isDefault
+                        };
+                        if (isDefault)
+                        {
+                            model.Image = Images[i];
+                        }
+                        db.ProductImages.Add(pi);
+                    }
+                    db.SaveChanges();
+                }
+
+                return RedirectToAction("Index");
+            }
+            ViewBag.ProductCategory = new SelectList(db.ProductCategories.ToList(), "Id", "Title");
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public ActionResult GetDiscountPercent(int promotionId)
+        {
+            var promotion = db.Promotions.FirstOrDefault(x => x.Id == promotionId);
+            if (promotion != null)
+            {
+                return Json(new { success = true, discountPercent = promotion.DiscountPercent }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Edit(int id)
+        {
+            ViewBag.ProductCategory = new SelectList(db.ProductCategories.ToList(), "Id", "Title");
+            ViewBag.Promotion = new SelectList(db.Promotions.ToList(), "Id", "Title");
+            var item = db.Products.Find(id);
+            var images = db.ProductImages.Where(x => x.ProductId == id).ToList();
+            ViewBag.ProductImages = images;
+            ViewBag.ProductId = id;
+            return View(item);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Product model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.ModifiedDate = DateTime.Now;
+                model.Alias = WebTH.Models.Common.Filter.FilterChar(model.Title);
+                db.Products.Attach(model);
+                db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            var item = db.Products.Find(id);
+            if (item != null)
+            {
+                db.Products.Remove(item);
+                db.SaveChanges();
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public ActionResult IsActive(int id)
+        {
+            var item = db.Products.Find(id);
+            if (item != null)
+            {
+                item.IsActive = !item.IsActive;
+                db.Entry(item).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+                return Json(new { success = true, isActive = item.IsActive });
+            }
+
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public ActionResult IsHome(int id)
+        {
+            var item = db.Products.Find(id);
+            if (item != null)
+            {
+                item.IsHome = !item.IsHome;
+                db.Entry(item).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+                return Json(new { success = true, isActive = item.IsActive });
+            }
+
+            return Json(new { success = false });
+        }
+    }
+}

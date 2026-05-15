@@ -1,0 +1,732 @@
+﻿
+@{
+    ViewBag.Title = "Thống kê doanh thu";
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Thống kê doanh thu</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Thống kê doanh thu</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    @*<a href="#" id="btnExportPdf" class="btn btn-outline-success">Xuất file pdf</a>*@
+    <!-- Nút xuất PDF và chọn ngày -->
+    <div class="form-inline mb-3">
+        <label for="exportDate" class="mr-2">Chọn ngày:</label>
+        <input type="date" id="exportDate" class="form-control mr-2" />
+        <button id="btnExportPdf" class="btn btn-outline-success">Xuất file PDF</button>
+    </div>
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thống kê doanh thu</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="chart">
+                        <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ngày</th>
+                                <th>Doanh thu</th>
+                                <th>Lợi nhuận</th>
+                            </tr>
+                        </thead>
+                        <tbody id="load_data">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="chart">
+                        <canvas id="barChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Thống kê doanh thu theo ngày, tháng, năm</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="filterType">Doanh thu theo:</label>
+                                <select id="filterType" class="form-control">
+                                    <option value="day">Ngày</option>
+                                    <option value="month">Tháng</option>
+                                    <option value="year">Năm</option>
+                                </select>
+                            </div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Thời gian</th>
+                                        <th>Doanh thu</th>
+                                        <th>Lợi nhuận</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="load_filter_data">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 3 Biểu đồ mới -->
+            <hr />
+            <h4 class="mt-4 mb-3">Biểu đồ phân tích bổ sung</h4>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Doanh thu vs Lợi nhuận (Pie Chart)</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="pieChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Xu hướng doanh thu (Line Chart)</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="lineChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Top 10 Sản phẩm bán chạy</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="topProductsChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Doanh thu theo danh mục</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="categoryChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- /.card-body -->
+        <div class="card-footer">
+            Footer
+        </div>
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+</section>
+<!-- /.content -->
+@section scripts {
+    <script src="~/Content/assets/plugins/chart.js/Chart.min.js"></script>
+    <script src="~/Content/assets/plugins/moment/moment.min.js"></script>
+    <script>
+        // Kiểm tra xem Chart.js có được load không
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js library not loaded! Check path: ~/Content/assets/plugins/chart.js/Chart.min.js');
+        } else {
+            console.log('Chart.js library loaded successfully');
+        }
+
+        // Biến toàn cục để lưu các instance biểu đồ
+        var barChartInstance;
+        var barChart2Instance;
+        var pieChartInstance;
+        var lineChartInstance;
+        var topProductsChartInstance;
+        var categoryChartInstance;
+
+        $(function () {
+            /* ChartJS
+             * -------
+             * Here we will create a few charts using ChartJS
+             */
+            var arrDoangThu = [];
+            var arrLoiNhuan = [];
+            var arrDate = [];
+            $.ajax({
+                url: '/Admin/Statistical/GetStatistical',
+                type: 'GET',
+                data: {},
+                success: function (rs) {
+                    console.log('Statistical data received:', rs);
+                    
+                    if (!rs || !rs.Data || rs.Data.length === 0) {
+                        console.warn('No data returned from GetStatistical');
+                        // Thêm dữ liệu mẫu để test chart
+                        rs = {
+                            Data: [
+                                { Date: '2026-02-15T00:00:00', DoanhThu: 1200000, LoiNhuan: 300000 },
+                                { Date: '2026-02-16T00:00:00', DoanhThu: 1500000, LoiNhuan: 400000 },
+                                { Date: '2026-02-17T00:00:00', DoanhThu: 1800000, LoiNhuan: 500000 }
+                            ]
+                        };
+                        console.log('Using sample data:', rs);
+                    }
+                    
+                    $.each(rs.Data, function (i, item) {
+                        var strDate = moment(item.Date).format('DD/MM/yyyy');
+                        arrDate.push(strDate);
+                        arrDoangThu.push(item.DoanhThu);
+                        arrLoiNhuan.push(item.LoiNhuan);
+                    });
+
+                    console.log('Processed data - Dates:', arrDate, 'Revenue:', arrDoangThu, 'Profit:', arrLoiNhuan);
+
+                    var areaChartData = {
+                        labels: arrDate,
+                        datasets: [
+                            {
+                                label: 'Lợi nhuận',
+                                backgroundColor: 'rgba(60,141,188,0.9)',
+                                borderColor: 'rgba(60,141,188,0.8)',
+                                pointRadius: false,
+                                pointColor: '#3b8bba',
+                                pointStrokeColor: 'rgba(60,141,188,1)',
+                                pointHighlightFill: '#fff',
+                                pointHighlightStroke: 'rgba(60,141,188,1)',
+                                data: arrLoiNhuan
+                            },
+                            {
+                                label: 'Doanh thu',
+                                backgroundColor: 'rgba(210, 214, 222, 1)',
+                                borderColor: 'rgba(210, 214, 222, 1)',
+                                pointRadius: false,
+                                pointColor: 'rgba(210, 214, 222, 1)',
+                                pointStrokeColor: '#c1c7d1',
+                                pointHighlightFill: '#fff',
+                                pointHighlightStroke: 'rgba(220,220,220,1)',
+                                data: arrDoangThu
+                            },
+                        ]
+                    }
+
+                    // This will get the first returned node in the jQuery collection.
+
+                    //-------------
+                    //- BAR CHART -
+                    //-------------
+                    var barChartElement = $('#barChart').get(0);
+                    if (barChartElement) {
+                        var barChartCanvas = barChartElement.getContext('2d');
+                        var barChartData = $.extend(true, {}, areaChartData)
+                        var temp0 = areaChartData.datasets[0]
+                        var temp1 = areaChartData.datasets[1]
+                        barChartData.datasets[0] = temp1
+                        barChartData.datasets[1] = temp0
+
+                        var barChartOptions = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            datasetFill: false
+                        }
+
+                        if (barChartInstance) {
+                            barChartInstance.destroy();
+                        }
+
+                        barChartInstance = new Chart(barChartCanvas, {
+                            type: 'bar',
+                            data: barChartData,
+                            options: barChartOptions
+                        });
+                    } else {
+                        console.warn('Bar Chart element not found');
+                    }
+
+                    // Pie Chart - Tỷ lệ doanh thu vs lợi nhuận
+                    createPieChart(arrDoangThu, arrLoiNhuan);
+
+                    // Line Chart - Xu hướng doanh thu
+                    createLineChart(arrDate, arrDoangThu, arrLoiNhuan);
+
+                    // Top Products Chart
+                    loadTopProductsChart();
+
+                    // Category Revenue Chart
+                    loadCategoryChart();
+                    load_data(rs.Data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('AJAX Error getting statistics:', textStatus, errorThrown);
+                    console.error('Response Status:', jqXHR.status);
+                    console.error('Response Text:', jqXHR.responseText);
+                }
+            });
+        })
+
+        // Hàm tạo Pie Chart
+        function createPieChart(doanhThu, loiNhuan) {
+            var pieChartElement = $('#pieChart').get(0);
+            if (!pieChartElement) {
+                console.warn('Pie Chart element not found');
+                return;
+            }
+            
+            var totalDoanhThu = doanhThu.reduce(function (a, b) { return a + b; }, 0);
+            var totalLoiNhuan = loiNhuan.reduce(function (a, b) { return a + b; }, 0);
+
+            if (pieChartInstance) {
+                pieChartInstance.destroy();
+            }
+
+            var ctx = pieChartElement.getContext('2d');
+            pieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Doanh thu tổng', 'Lợi nhuận tổng'],
+                    datasets: [{
+                        data: [totalDoanhThu, totalLoiNhuan],
+                        backgroundColor: [
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(76, 175, 80, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(76, 175, 80, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.label + ': ' + context.parsed + ' đ';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Hàm tạo Line Chart
+        function createLineChart(labels, doanhThu, loiNhuan) {
+            var lineChartElement = $('#lineChart').get(0);
+            if (!lineChartElement) {
+                console.warn('Line Chart element not found');
+                return;
+            }
+            
+            if (lineChartInstance) {
+                lineChartInstance.destroy();
+            }
+
+            var ctx = lineChartElement.getContext('2d');
+            lineChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Doanh thu',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            data: doanhThu,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Lợi nhuận',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            pointBackgroundColor: 'rgba(76, 175, 80, 1)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            data: loiNhuan,
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' đ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Hàm tạo Top Products Chart
+        function loadTopProductsChart() {
+            $.ajax({
+                url: '/Admin/Statistical/GetTopProducts',
+                type: 'GET',
+                success: function (rs) {
+                    console.log('Top products data received:', rs);
+                    
+                    if (!rs.Data || rs.Data.length === 0) {
+                        console.warn('No top products data returned');
+                        return;
+                    }
+                    
+                    var productNames = [];
+                    var quantities = [];
+                    var revenues = [];
+
+                    $.each(rs.Data, function (i, item) {
+                        productNames.push(item.ProductName);
+                        quantities.push(item.QuantitySold);
+                        revenues.push(item.Revenue);
+                    });
+
+                    createTopProductsChart(productNames, quantities, revenues);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error loading top products:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        function createTopProductsChart(names, quantities, revenues) {
+            var topProductsElement = $('#topProductsChart').get(0);
+            if (!topProductsElement) {
+                console.warn('Top Products Chart element not found');
+                return;
+            }
+            
+            if (topProductsChartInstance) {
+                topProductsChartInstance.destroy();
+            }
+
+            var ctx = topProductsElement.getContext('2d');
+            topProductsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: names,
+                    datasets: [
+                        {
+                            label: 'Số lượng bán',
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            data: quantities
+                        },
+                        {
+                            label: 'Doanh thu',
+                            backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            data: revenues
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    if (context.dataset.label === 'Số lượng bán') {
+                                        return context.dataset.label + ': ' + context.parsed.x;
+                                    } else {
+                                        return context.dataset.label + ': ' + context.parsed.x + ' đ';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Hàm tạo Category Revenue Chart
+        function loadCategoryChart() {
+            $.ajax({
+                url: '/Admin/Statistical/GetRevenueByCategory',
+                type: 'GET',
+                success: function (rs) {
+                    console.log('Category data received:', rs);
+                    
+                    if (!rs.Data || rs.Data.length === 0) {
+                        console.warn('No category data returned');
+                        return;
+                    }
+                    
+                    var categoryNames = [];
+                    var revenues = [];
+                    var colors = [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(102, 255, 102, 0.8)',
+                        'rgba(255, 102, 178, 0.8)',
+                        'rgba(102, 178, 255, 0.8)',
+                        'rgba(255, 178, 102, 0.8)'
+                    ];
+
+                    $.each(rs.Data, function (i, item) {
+                        categoryNames.push(item.CategoryName);
+                        revenues.push(item.Revenue);
+                    });
+
+                    createCategoryChart(categoryNames, revenues, colors);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error loading category data:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        function createCategoryChart(names, revenues, colors) {
+            var categoryChartElement = $('#categoryChart').get(0);
+            if (!categoryChartElement) {
+                console.warn('Category Chart element not found');
+                return;
+            }
+            
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+            }
+
+            var ctx = categoryChartElement.getContext('2d');
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: names,
+                    datasets: [{
+                        data: revenues,
+                        backgroundColor: colors.slice(0, names.length),
+                        borderColor: colors.map(c => c.replace('0.8', '1')).slice(0, names.length),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.label + ': ' + context.parsed + ' đ';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function load_data(data) {
+            var strHtml = "";
+            $.each(data, function (i, item) {
+                var strDate = moment(item.Date).format('DD/MM/yyyy');
+                strHtml += "<tr>";
+                strHtml += "<td>" + (i + 1) + "</td>";
+                strHtml += "<td>" + strDate + "</td>";
+                strHtml += "<td>" + item.DoanhThu + "</td>";
+                strHtml += "<td>" + item.LoiNhuan + "</td>";
+                strHtml += "</tr>";
+            });
+            $('#load_data').html(strHtml);
+        }
+
+    </script>
+    <script>
+        //$(function () {
+        //    $("#filterType").change(function () {
+        //        var filterType = $(this).val();
+        //        $.ajax({
+        //            url: '/Statistical/GetStatisticalByFilter',
+        //            type: 'GET',
+        //            data: { filterType: filterType },
+        //            success: function (rs) {
+
+        //                var strHtml = "";
+        //                $.each(rs.Data, function (i, item) {
+        //                    strHtml += "<tr>";
+        //                    strHtml += "<td>" + (i + 1) + "</td>";
+        //                    strHtml += "<td>" + item.Date + "</td>";
+        //                    strHtml += "<td>" + item.DoanhThu + "</td>";
+        //                    strHtml += "<td>" + item.LoiNhuan + "</td>";
+        //                    strHtml += "</tr>";
+        //                });
+        //                $('#load_filter_data').html(strHtml);
+        //            }
+        //        });
+        //    });
+        //});
+
+        $(function () {
+            $("#filterType").change(function () {
+                var filterType = $(this).val();
+                $.ajax({
+                    url: '/Admin/Statistical/GetStatisticalByFilter',
+                    type: 'GET',
+                    data: { filterType: filterType },
+                    success: function (rs) {
+                        var arrDoanhThu = [];
+                        var arrLoiNhuan = [];
+                        var arrDate = [];
+                        $.each(rs.Data, function (i, item) {
+                            arrDate.push(item.Date);
+                            arrDoanhThu.push(item.DoanhThu);
+                            arrLoiNhuan.push(item.LoiNhuan);
+                        });
+
+                        // Hiển thị dữ liệu trong bảng
+                        var strHtml = "";
+                        $.each(rs.Data, function (i, item) {
+                            strHtml += "<tr>";
+                            strHtml += "<td>" + (i + 1) + "</td>";
+                            strHtml += "<td>" + item.Date + "</td>";
+                            strHtml += "<td>" + item.DoanhThu + "</td>";
+                            strHtml += "<td>" + item.LoiNhuan + "</td>";
+                            strHtml += "</tr>";
+                        });
+                        $('#load_filter_data').html(strHtml);
+
+                        // Tạo biểu đồ barChart2
+                        createBarChart2(arrDate, arrDoanhThu, arrLoiNhuan);
+                    }
+                });
+            });
+        });
+
+        // Hàm tạo biểu đồ barChart2
+        function createBarChart2(labels, doanhThu, loiNhuan) {
+            var barChart2Element = $('#barChart2').get(0);
+            if (!barChart2Element) {
+                console.warn('Bar Chart 2 element not found');
+                return;
+            }
+            
+            if (barChart2Instance) {
+                barChart2Instance.destroy(); // Xóa biểu đồ cũ nếu tồn tại
+            }
+
+            var ctx = barChart2Element.getContext('2d');
+            var barChartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Lợi nhuận',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        data: loiNhuan
+                    },
+                    {
+                        label: 'Doanh thu',
+                        backgroundColor: 'rgba(210, 214, 222, 1)',
+                        borderColor: 'rgba(210, 214, 222, 1)',
+                        data: doanhThu
+                    },
+                ]
+            };
+
+            var barChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                datasetFill: false
+            };
+
+            barChart2Instance = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData,
+                options: barChartOptions
+            });
+        }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#btnExportPdf').on('click', function (e) {
+                e.preventDefault();
+                var exportDate = $('#exportDate').val(); // yyyy-MM-dd
+
+                if (!exportDate) {
+                    alert("Vui lòng chọn ngày trước khi xuất PDF!");
+                    return;
+                }
+
+                var url = '/Admin/Statistical/ExportPdf?selectedDate=' + exportDate;
+                window.open(url, '_blank');
+            });
+        });
+
+    </script>
+}
+

@@ -1,0 +1,107 @@
+﻿@model WebTH.Models.OrderViewModel
+@{
+    var currentUser = ViewBag.User as WebTH.Models.ApplicationUser;
+    var fullName = currentUser != null ? currentUser.Fullname : string.Empty;
+    var phone = currentUser != null ? currentUser.Phone : string.Empty;
+    var email = currentUser != null ? currentUser.Email : string.Empty;
+}
+
+@using (Ajax.BeginForm("CheckOut", "Shoppingcart", new AjaxOptions
+{
+    HttpMethod = "POST",
+    UpdateTargetId = "load_data",
+    OnSuccess = "OnSuccessCO",
+    OnFailure = "OnFailure",
+    OnBegin = "OnBeginCO"
+}, new { @Id = "myForm", @class = "checkout-form" }))
+{
+    <script>
+        function OnBeginCO() {
+            var $btn = $('#btnCheckOut');
+            $btn.attr('disabled', 'disabled');
+            $btn.html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+            $('#load_send').html('<div class="checkout-processing"><i class="fa fa-clock-o"></i> Hệ thống đang tạo đơn hàng, vui lòng chờ...</div>');
+        }
+
+        function OnSuccessCO(res) {
+            if (res && res.Success) {
+                $('#load_send').html('<div class="checkout-processing checkout-processing-success"><i class="fa fa-check-circle"></i> Tạo đơn thành công, đang chuyển trang...</div>');
+                if (res.Code == 1) {
+                    location.href = "/ShoppingCart/CheckOutSuccess";
+                }
+                else {
+                    location.href = res.Url;
+                }
+                return;
+            }
+
+            $('#btnCheckOut').removeAttr('disabled').html('<i class="fa fa-lock"></i> Xác nhận đặt hàng');
+            $('#load_send').html('<div class="checkout-processing checkout-processing-error"><i class="fa fa-exclamation-circle"></i> Không thể tạo đơn hàng. Vui lòng thử lại.</div>');
+        }
+    </script>
+
+    @Html.AntiForgeryToken()
+
+    <div class="checkout-form-head">
+        <h3>Thông tin nhận hàng</h3>
+        <p>Điền chính xác để shop liên hệ xác nhận và giao hàng nhanh hơn.</p>
+    </div>
+
+    <div class="form-group checkout-field">
+        <label for="CustomerName">Họ tên khách hàng</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+            <input type="text" id="CustomerName" name="CustomerName" value="@fullName" required class="form-control" autocomplete="off" placeholder="Nguyễn Văn A" />
+        </div>
+    </div>
+
+    <div class="form-group checkout-field">
+        <label for="Phone">Số điện thoại</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+            <input type="text" id="Phone" name="Phone" value="@phone" required class="form-control" autocomplete="off" placeholder="09xx xxx xxx" />
+        </div>
+    </div>
+
+    <div class="form-group checkout-field">
+        <label for="Address">Địa chỉ nhận hàng</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+            <input type="text" id="Address" name="Address" required class="form-control" autocomplete="off" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành" />
+        </div>
+    </div>
+
+    <div class="form-group checkout-field">
+        <label for="Email">Email</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+            <input type="email" id="Email" name="Email" value="@email" class="form-control" autocomplete="off" placeholder="email@domain.com" />
+        </div>
+        <p class="checkout-help">Email dùng để gửi xác nhận đơn hàng và trạng thái thanh toán.</p>
+    </div>
+
+    <div class="form-group checkout-field">
+        <label for="drTypePayment">Hình thức thanh toán</label>
+        <select class="form-control" name="TypePayment" id="drTypePayment">
+            <option value="1" selected>COD - Thanh toán khi nhận hàng</option>
+            <option value="2">Chuyển khoản trực tuyến (VNPAY)</option>
+        </select>
+    </div>
+
+    <div class="form-group checkout-vnpay-options" id="load_form_payment" style="display: none;">
+        <h4>Chọn phương thức tại cổng VNPAY</h4>
+        <label class="checkout-radio"><input type="radio" name="TypePaymentVN" value="0" checked /> Cổng thanh toán VNPAYQR</label>
+        <label class="checkout-radio"><input type="radio" name="TypePaymentVN" value="1" /> Thanh toán qua ứng dụng hỗ trợ VNPAYQR</label>
+        <label class="checkout-radio"><input type="radio" name="TypePaymentVN" value="2" /> ATM - Tài khoản ngân hàng nội địa</label>
+        <label class="checkout-radio"><input type="radio" name="TypePaymentVN" value="3" /> Thanh toán qua thẻ quốc tế</label>
+    </div>
+
+    <div class="form-group" id="load_send"></div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-block checkout-submit" id="btnCheckOut">
+            <i class="fa fa-lock"></i> Xác nhận đặt hàng
+        </button>
+        <p class="checkout-terms">Bằng việc đặt hàng, bạn đồng ý với điều khoản mua hàng và chính sách bảo mật của cửa hàng.</p>
+    </div>
+}

@@ -1,0 +1,366 @@
+﻿@using WebTH.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Đăng nhập";
+}
+
+<style>
+    /* Login Page Styles */
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .auth-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        align-items: center;
+    }
+
+    .auth-left {
+        padding: 60px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-left h1 {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .auth-left p {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
+
+    .auth-left-features {
+        gap: 20px;
+    }
+
+    .features-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .features-item i {
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .features-item span {
+        font-size: 14px;
+    }
+
+    .auth-right {
+        padding: 60px;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-form {
+        max-width: 400px;
+    }
+
+    .auth-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 10px;
+    }
+
+    .auth-subtitle {
+        font-size: 14px;
+        color: #999;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="email"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 20px 0;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .remember-me input {
+        cursor: pointer;
+    }
+
+    .form-links {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+
+    .form-links a {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .form-links a:hover {
+        color: #764ba2;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .auth-divider {
+        text-align: center;
+        margin: 25px 0;
+        font-size: 14px;
+        color: #999;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 100%;
+        height: 1px;
+        background: #e0e0e0;
+        z-index: 0;
+    }
+
+    .auth-divider span {
+        position: relative;
+        background: white;
+        padding: 0 10px;
+    }
+
+    .social-login {
+        display: flex;
+        gap: 10px;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .social-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .signup-link {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
+    }
+
+    .signup-link a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .validation-error {
+        color: #ff6b6b;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .error-message {
+        background: #ffe0e0;
+        color: #cc0000;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        border-left: 4px solid #cc0000;
+    }
+
+    @@media (max-width: 1024px) {
+        .auth-content {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-left {
+            display: none;
+        }
+
+        .auth-right {
+            padding: 40px 20px;
+            border-radius: 12px;
+            max-width: 100%;
+        }
+    }
+</style>
+
+<section class="auth-container">
+    <div class="auth-content">
+        <!-- Left Side - Brand Info -->
+        <div class="auth-left">
+            <h1>PetFood Online</h1>
+            <p style="color:white;">Cửa hàng thức ăn thú cưng trực tuyến, chuyên cung cấp thức ăn chất lượng cao cho cún cưng và mèo cưng của bạn.</p>
+            <div class="auth-left-features">
+                <div class="features-item">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Thức ăn chất lượng cao từ các thương hiệu nổi tiếng</span>
+                </div>
+                <div class="features-item">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Giao hàng nhanh chóng trên toàn thành phố</span>
+                </div>
+                <div class="features-item">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Hỗ trợ khách hàng 24/7</span>
+                </div>
+                <div class="features-item">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Giá cạnh tranh, ưu đãi hàng ngày</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="auth-right">
+            <div class="auth-form">
+                <h2 class="auth-title">Đăng nhập</h2>
+                <p class="auth-subtitle">Chào mừng quay lại! Đăng nhập để tiếp tục mua sắm.</p>
+
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    
+                    if (!ViewData.ModelState.IsValid && ViewData.ModelState.Any())
+                    {
+                        <div class="error-message">
+                            <i class="fa fa-times-circle"></i> Thông tin đăng nhập không chính xác. Vui lòng thử lại.
+                        </div>
+                    }
+
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.UserName, "Tên đăng nhập")
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Nhập tên đăng nhập" })
+                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "validation-error" })
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password, "Mật khẩu")
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "validation-error" })
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="remember-me">
+                        @Html.CheckBoxFor(m => m.RememberMe)
+                        @Html.LabelFor(m => m.RememberMe, "Ghi nhớ tôi")
+                    </div>
+
+                    <!-- Links -->
+                    <div class="form-links">
+                        @Html.ActionLink("Quên mật khẩu?", "ForgotPassword", "Account")
+                    </div>
+
+                    <!-- Submit Button -->
+                    <input type="submit" value="Đăng nhập" class="submit-btn" />
+                }
+
+                <!-- Divider -->
+                <div class="auth-divider">
+                    <span>hoặc</span>
+                </div>
+
+                <!-- Social Login -->
+                <div class="social-login">
+                    @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                </div>
+
+                <!-- Sign Up Link -->
+                <div class="signup-link">
+                    Chưa có tài khoản? <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

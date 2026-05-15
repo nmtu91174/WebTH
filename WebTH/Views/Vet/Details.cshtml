@@ -1,0 +1,1194 @@
+﻿@model WebTH.Controllers.VetClinicDetailViewModel
+
+@{
+    ViewBag.Title = Model.Clinic.ClinicName;
+}
+
+<style>
+.vet-hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 0;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.vet-hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+    background-repeat: repeat-x;
+}
+
+.vet-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.clinic-logo-wrapper {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    max-width: 250px;
+}
+
+.clinic-logo-wrapper img {
+    border-radius: 10px;
+    max-height: 220px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.clinic-logo-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    width: 100%;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.clinic-info-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin: 5px 5px 5px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.clinic-info-highlight i {
+    font-size: 1.2em;
+}
+
+.rating-display-large {
+    font-size: 2.5em;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stars {
+    color: #ffc107;
+    letter-spacing: 3px;
+}
+
+.contact-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.contact-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.contact-icon {
+    color: #667eea;
+    font-size: 1.3em;
+    min-width: 30px;
+    text-align: center;
+}
+
+.contact-info {
+    flex: 1;
+}
+
+.contact-info strong {
+    display: block;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+.contact-info a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.contact-info a:hover {
+    text-decoration: underline;
+}
+
+.section-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #667eea;
+}
+
+.section-title i {
+    color: #667eea;
+}
+
+.description-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #667eea;
+}
+
+.description-card p {
+    line-height: 1.8;
+    color: #555;
+    font-size: 1.05em;
+}
+
+.doctor-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.doctor-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.doctor-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.doctor-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.doctor-content {
+    padding: 20px;
+}
+
+.doctor-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.doctor-specialty {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.doctor-info {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.recommendation-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-top: 4px solid #667eea;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.recommendation-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.recommendation-header {
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.recommendation-product-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.recommendation-product-title a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.recommendation-product-title a:hover {
+    text-decoration: underline;
+}
+
+.level-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.level-essential {
+    background: #ff6b6b;
+    color: white;
+}
+
+.level-strong {
+    background: #ffd93d;
+    color: #333;
+}
+
+.level-normal {
+    background: #6bcf7f;
+    color: white;
+}
+
+.recommendation-body {
+    padding: 20px;
+}
+
+.recommendation-tags {
+    margin-bottom: 15px;
+}
+
+.pet-tag, .condition-tag {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.pet-tag {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.condition-tag {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.recommendation-text {
+    color: #555;
+    margin: 12px 0;
+    line-height: 1.6;
+}
+
+.recommendation-meta {
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 0.9em;
+    color: #999;
+}
+
+.recommendation-meta strong {
+    color: #333;
+}
+
+.recommendation-votes {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.vote-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.vote-btn-helpful {
+    border-color: #6bcf7f;
+    color: #6bcf7f;
+}
+
+.vote-btn-helpful:hover {
+    background: #6bcf7f;
+    color: white;
+}
+
+.vote-btn-unhelpful {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.vote-btn-unhelpful:hover {
+    background: #ff6b6b;
+    color: white;
+}
+
+.rating-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.rating-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.rating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.rating-user-info h6 {
+    margin: 0 0 5px 0;
+    font-weight: 700;
+    color: #333;
+}
+
+.rating-date {
+    font-size: 0.85em;
+    color: #999;
+}
+
+.rating-card .rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffc107;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.rating-comment {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.rating-details {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.rating-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.rating-detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #333;
+    font-weight: 700;
+}
+
+.rating-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6bcf7f;
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.rating-form-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 40px;
+    color: white;
+    margin: 50px 0;
+}
+
+.rating-form-header {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-group-custom label {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.form-group-custom input,
+.form-group-custom textarea,
+.form-group-custom select {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.form-group-custom input:focus,
+.form-group-custom textarea:focus,
+.form-group-custom select:focus {
+    background: white;
+    border-color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
+
+.rating-input-group {
+    margin-bottom: 20px;
+}
+
+.rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rating-stars .star-btn {
+    min-width: 52px;
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rating-stars .star-btn:hover {
+    transform: translateY(-1px);
+    border-color: #fff;
+}
+
+.rating-stars .star-btn.selected {
+    background: #fff;
+    border-color: #fff;
+    color: #667eea;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn-primary {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.submit-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.no-ratings-message {
+    background: #e3f2fd;
+    border-left: 5px solid #2196f3;
+    padding: 20px;
+    border-radius: 8px;
+    color: #1565c0;
+    font-weight: 500;
+}
+
+@@media (max-width: 768px) {
+    .vet-hero-section {
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 1.4em;
+        margin-bottom: 20px;
+    }
+
+    .clinic-logo-wrapper {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .rating-form-section {
+        padding: 30px 20px;
+    }
+
+    .rating-input-group {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
+}
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="container" style="margin-top: 20px;">
+        <div class="alert alert-success" role="alert">
+            <i class="fa fa-check-circle"></i> @TempData["Success"]
+        </div>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="container" style="margin-top: 20px;">
+        <div class="alert alert-danger" role="alert">
+            <i class="fa fa-exclamation-triangle"></i> @TempData["Error"]
+        </div>
+    </div>
+}
+
+<!-- Hero Section -->
+<div class="vet-hero-section">
+    <div class="container">
+        <div class="row align-items-center vet-hero-content">
+            <div class="col-lg-3 mb-4 mb-lg-0 text-center text-lg-left">
+                @if (!string.IsNullOrEmpty(Model.Clinic.Logo))
+                {
+                    <div class="clinic-logo-wrapper">
+                        <img src="@Model.Clinic.Logo" alt="@Model.Clinic.ClinicName">
+                    </div>
+                }
+                else
+                {
+                    <div class="clinic-logo-wrapper">
+                        <div class="clinic-logo-placeholder">
+                            <i class="fa fa-hospital-o" style="font-size: 80px;"></i>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-9">
+                <h1 style="font-size: 2.5em; font-weight: 800; margin-bottom: 15px;">@Model.Clinic.ClinicName</h1>
+
+                <!-- Rating Stars Large -->
+                <div class="rating-display-large mb-4">
+                    <span class="stars">
+                        @{
+                            int fullStars = (int)Math.Floor(Model.AverageRating);
+                            bool hasHalfStar = Model.AverageRating % 1 >= 0.5m;
+
+                            for (int i = 0; i < fullStars; i++)
+                            {
+                                <i class="fa fa-star"></i>
+                            }
+                            if (hasHalfStar && fullStars < 5)
+                            {
+                                <i class="fa fa-star-half-o"></i>
+                                fullStars++;
+                            }
+                            for (int i = fullStars; i < 5; i++)
+                            {
+                                <i class="fa fa-star"></i>
+                            }
+                        }
+                    </span>
+                    <span style="font-size: 0.8em;">@Model.AverageRating.ToString("F1") (@Model.TotalReviews đánh giá)</span>
+                </div>
+
+                <!-- Info Badges -->
+                <div style="margin-bottom: 20px;">
+                    @if (Model.Clinic.IsVerified)
+                    {
+                        <div class="clinic-info-highlight">
+                            <i class="fa fa-check-circle"></i>
+                            <span>Đã Xác Minh</span>
+                        </div>
+                    }
+                    @if (Model.Clinic.YearsInBusiness.HasValue)
+                    {
+                        <div class="clinic-info-highlight">
+                            <i class="fa fa-clock"></i>
+                            <span>@Model.Clinic.YearsInBusiness năm kinh nghiệm</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Contact Card -->
+                <div class="contact-card">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fa fa-phone"></i>
+                        </div>
+                        <div class="contact-info">
+                            <strong>Điện thoại</strong>
+                            @Model.Clinic.Phone
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fa fa-envelope"></i>
+                        </div>
+                        <div class="contact-info">
+                            <strong>Email</strong>
+                            <a href="mailto:@Model.Clinic.Email">@Model.Clinic.Email</a>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Clinic.Website))
+                    {
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fa fa-globe"></i>
+                            </div>
+                            <div class="contact-info">
+                                <strong>Website</strong>
+                                <a href="@Model.Clinic.Website" target="_blank">@Model.Clinic.Website</a>
+                            </div>
+                        </div>
+                    }
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fa fa-map-marker"></i>
+                        </div>
+                        <div class="contact-info">
+                            <strong>Địa chỉ</strong>
+                            @Model.Clinic.Address
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Clinic.SpecializationAreas))
+                    {
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fa fa-paw"></i>
+                            </div>
+                            <div class="contact-info">
+                                <strong>Chuyên ngành</strong>
+                                @Model.Clinic.SpecializationAreas
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description Section -->
+@if (!string.IsNullOrEmpty(Model.Clinic.Description))
+{
+    <div class="container mb-5">
+        <div class="description-card">
+            <h3 style="color: #667eea; margin-bottom: 15px;"><i class="fa fa-info-circle"></i> Giới Thiệu</h3>
+            <p>@Model.Clinic.Description</p>
+        </div>
+    </div>
+}
+
+<!-- Doctors Section -->
+@if (Model.Doctors.Count > 0)
+{
+    <div class="container mb-5">
+        <div class="section-title">
+            <i class="fa fa-user-md"></i> Đội Ngũ Bác Sĩ Thú Y
+        </div>
+        <div class="row">
+            @foreach (var doctor in Model.Doctors)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="doctor-card">
+                        <div class="doctor-image">
+                            @if (!string.IsNullOrEmpty(doctor.Avatar))
+                            {
+                                <img src="@doctor.Avatar" alt="@doctor.DoctorName">
+                            }
+                            else
+                            {
+                                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fa fa-user-md" style="font-size: 60px;"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="doctor-content">
+                            <div class="doctor-name">@doctor.DoctorName</div>
+                            @if (!string.IsNullOrEmpty(doctor.Specialization))
+                            {
+                                <div class="doctor-specialty">
+                                    <i class="fa fa-certificate"></i> @doctor.Specialization
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(doctor.Qualifications))
+                            {
+                                <div class="doctor-info">
+                                    <i class="fa fa-medal"></i> @doctor.Qualifications
+                                </div>
+                            }
+                            @if (doctor.ExperienceYears.HasValue)
+                            {
+                                <div class="doctor-info">
+                                    <i class="fa fa-briefcase"></i> @doctor.ExperienceYears năm kinh nghiệm
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Recommendations Section -->
+@if (Model.Recommendations.Count > 0)
+{
+    <div class="container mb-5">
+        <div class="section-title">
+            <i class="fa fa-lightbulb"></i> Khuyến Cáo Sản Phẩm Do Bác Sĩ
+        </div>
+        <div class="row">
+            @foreach (var rec in Model.Recommendations)
+            {
+                <div class="col-lg-6 mb-4">
+                    <div class="recommendation-card">
+                        <div class="recommendation-header">
+                            <p class="recommendation-product-title">
+                                @if (rec.Product != null)
+                                {
+                                    <a href="@Url.Action("Details", "Products", new { id = rec.Product.Id })">
+                                        @rec.Product.Title
+                                    </a>
+                                }
+                            </p>
+                        </div>
+                        <div class="recommendation-body">
+                            <!-- Pet Type & Health Condition -->
+                            @if (!string.IsNullOrEmpty(rec.PetType) || !string.IsNullOrEmpty(rec.HealthCondition))
+                            {
+                                <div class="recommendation-tags">
+                                    @if (!string.IsNullOrEmpty(rec.PetType))
+                                    {
+                                        <span class="pet-tag">@rec.PetType</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(rec.HealthCondition))
+                                    {
+                                        <span class="condition-tag">@rec.HealthCondition</span>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Recommendation Level -->
+                            @{
+                                string levelClass = rec.RecommendationLevel == 3 ? "level-essential" :
+                                                   rec.RecommendationLevel == 2 ? "level-strong" : "level-normal";
+                                string levelText = rec.RecommendationLevel == 3 ? "Cần Thiết" :
+                                                  rec.RecommendationLevel == 2 ? "Khuyến Cáo Mạnh" : "Khuyến Cáo";
+                            }
+                            <span class="level-badge @levelClass">@levelText</span>
+
+                            <!-- Reason -->
+                            <p class="recommendation-text">@rec.ReccommendationReason</p>
+
+                            <!-- Doctor & Date -->
+                            <div class="recommendation-meta">
+                                @if (rec.VetDoctor != null)
+                                {
+                                    <div>
+                                        <i class="fa fa-user"></i> Khuyến cáo bởi: <strong>@rec.VetDoctor.DoctorName</strong>
+                                    </div>
+                                }
+                                <div>
+                                    <i class="fa fa-calendar"></i> @rec.CreatedDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </div>
+
+                            <!-- Helpful Votes -->
+                            <div class="recommendation-votes">
+                                <button class="vote-btn vote-btn-helpful vote-helpful" data-id="@rec.Id" type="button">
+                                    <i class="fa fa-thumbs-up"></i> Hữu ích (@rec.HelpfulCount)
+                                </button>
+                                <button class="vote-btn vote-btn-unhelpful vote-unhelpful" data-id="@rec.Id" type="button">
+                                    <i class="fa fa-thumbs-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Ratings Section -->
+<div class="container mb-5">
+    <div class="section-title">
+        <i class="fa fa-comments"></i> Đánh Giá Từ Khách Hàng
+    </div>
+
+    @if (Model.Ratings.Count > 0)
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                @foreach (var rating in Model.Ratings)
+                {
+                    <div class="rating-card">
+                        <div class="rating-header">
+                            <div class="rating-user-info">
+                                <h6>@rating.UserName</h6>
+                                <div class="rating-date">
+                                    <i class="fa fa-calendar"></i> @rating.CreatedDate.ToString("dd/MM/yyyy")
+                                    @if (rating.VisitDate.HasValue)
+                                    {
+                                        <span>| Ghé thăm: @rating.VisitDate.Value.ToString("dd/MM/yyyy")</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="rating-stars">
+                                <i class="fa fa-star"></i> @rating.Rating/5
+                            </div>
+                        </div>
+
+                        <p class="rating-comment">@rating.Comment</p>
+
+                        <!-- Detailed Ratings -->
+                        @if (rating.ServiceQuality.HasValue || rating.Professionalism.HasValue ||
+                             rating.Facility.HasValue || rating.PriceValue.HasValue)
+                        {
+                            <div class="rating-details">
+                                @if (rating.ServiceQuality.HasValue)
+                                {
+                                    <div class="rating-detail-item">
+                                        <span class="detail-label">
+                                            <i class="fa fa-handshake-o"></i> Chất lượng dịch vụ
+                                        </span>
+                                        <span class="detail-value">@rating.ServiceQuality/5 <i class="fa fa-star text-warning"></i></span>
+                                    </div>
+                                }
+                                @if (rating.Professionalism.HasValue)
+                                {
+                                    <div class="rating-detail-item">
+                                        <span class="detail-label">
+                                            <i class="fa fa-medal"></i> Chuyên môn
+                                        </span>
+                                        <span class="detail-value">@rating.Professionalism/5 <i class="fa fa-star text-warning"></i></span>
+                                    </div>
+                                }
+                                @if (rating.Facility.HasValue)
+                                {
+                                    <div class="rating-detail-item">
+                                        <span class="detail-label">
+                                            <i class="fa fa-building"></i> Cơ sở vật chất
+                                        </span>
+                                        <span class="detail-value">@rating.Facility/5 <i class="fa fa-star text-warning"></i></span>
+                                    </div>
+                                }
+                                @if (rating.PriceValue.HasValue)
+                                {
+                                    <div class="rating-detail-item">
+                                        <span class="detail-label">
+                                            <i class="fa fa-money"></i> Giá trị tiền
+                                        </span>
+                                        <span class="detail-value">@rating.PriceValue/5 <i class="fa fa-star text-warning"></i></span>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (rating.IsVerified)
+                        {
+                            <div class="rating-verified">
+                                <i class="fa fa-check-circle"></i> Khách hàng đã xác minh
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Sidebar Summary -->
+            <div class="col-lg-4">
+                <div class="card" style="background: #f9f9f9; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; font-size: 1.2em; font-weight: 700;">
+                        <i class="fa fa-star"></i> Tóm Tắt Đánh Giá
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 3em; font-weight: 800; color: #667eea;">@Model.AverageRating.ToString("F1")</div>
+                            <div style="color: #ffc107; margin-bottom: 10px;">
+                                @{
+                                    for (int i = 0; i < (int)Model.AverageRating; i++)
+                                    {
+                                        <i class="fa fa-star"></i>
+                                    }
+                                    if (Model.AverageRating % 1 >= 0.5m)
+                                    {
+                                        <i class="fa fa-star-half-o"></i>
+                                    }
+                                }
+                            </div>
+                            <div style="color: #666; font-size: 0.9em;">Dựa trên @Model.TotalReviews đánh giá</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="no-ratings-message">
+            <i class="fa fa-info-circle"></i> Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!
+        </div>
+    }
+</div>
+
+<!-- Add Rating Form Section -->
+<div class="rating-form-section">
+    <div class="container">
+        <div class="rating-form-header">
+            <i class="fa fa-pencil-square"></i> Chia Sẻ Đánh Giá Của Bạn
+        </div>
+
+        @using (Html.BeginForm("AddRating", "Vet", new { clinicId = Model.Clinic.Id }, FormMethod.Post, new { id = "addRatingForm", novalidate = "novalidate" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group-custom">
+                        <label><i class="fa fa-user"></i> Tên <span style="color: #ff6b6b;">*</span></label>
+                        <input type="text" name="rating.UserName" class="form-control" placeholder="Nhập tên của bạn" required>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label><i class="fa fa-envelope"></i> Email</label>
+                        <input type="email" name="rating.Email" class="form-control" placeholder="Nhập email của bạn">
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label><i class="fa fa-phone"></i> Điện thoại</label>
+                        <input type="tel" name="rating.Phone" class="form-control" placeholder="Nhập số điện thoại">
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="form-group-custom">
+                        <label><i class="fa fa-calendar"></i> Ngày ghé thăm</label>
+                        <input type="date" name="rating.VisitDate" class="form-control">
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label><i class="fa fa-star"></i> Đánh giá tổng thể <span style="color: #ff6b6b;">*</span></label>
+                        <div class="rating-input-group">
+                            <div class="rating-stars" id="ratingStars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <button type="button" class="star-btn @(i == 1 ? "selected" : "")" data-value="@i" title="@i sao">
+                                        @for (int j = 0; j < i; j++)
+                                        {
+                                            <i class="fa fa-star"></i>
+                                        }
+                                    </button>
+                                }
+                            </div>
+                            <input type="hidden" name="rating.Rating" id="RatingValue" value="1" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group-custom">
+                <label><i class="fa fa-comment"></i> Nhận xét chi tiết <span style="color: #ff6b6b;">*</span></label>
+                <textarea name="rating.Comment" class="form-control" rows="4" placeholder="Chia sẻ trải nghiệm của bạn..." style="resize: vertical;" required></textarea>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 15px;">
+                <button type="submit" class="submit-btn-primary">
+                    <i class="fa fa-paper-plane"></i> Gửi Đánh Giá
+                </button>
+                <button type="reset" id="ratingFormResetBtn" style="background: rgba(255,255,255,0.15); color: white; border: 2px solid rgba(255,255,255,0.3); padding: 14px 40px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fa fa-repeat"></i> Nhập Lại
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    function notify(type, message) {
+        if (window.toastr && typeof window.toastr[type] === 'function') {
+            window.toastr[type](message);
+            return;
+        }
+        alert(message);
+    }
+
+    $('.vote-helpful').click(function(e) {
+        e.preventDefault();
+        var recommendationId = $(this).data('id');
+        var button = $(this);
+        $.post('@Url.Action("VoteHelpful", "Vet")',
+            { recommendationId: recommendationId, isHelpful: true },
+            function(data) {
+                if (data.success) {
+                    var helpfulCount = (typeof data.helpfulCount !== 'undefined' && data.helpfulCount !== null)
+                        ? data.helpfulCount
+                        : 0;
+                    button.html('<i class="fa fa-thumbs-up"></i> Hữu ích (' + helpfulCount + ')');
+                    button.prop('disabled', true);
+                    button.css('opacity', '0.6');
+                    notify('success', 'Cảm ơn bạn đã bình chọn!');
+                }
+            }
+        ).fail(function() {
+            notify('error', 'Đã xảy ra lỗi. Vui lòng thử lại!');
+        });
+    });
+
+    $('.vote-unhelpful').click(function(e) {
+        e.preventDefault();
+        var recommendationId = $(this).data('id');
+        var button = $(this);
+        $.post('@Url.Action("VoteHelpful", "Vet")',
+            { recommendationId: recommendationId, isHelpful: false },
+            function(data) {
+                if (data.success) {
+                    button.prop('disabled', true);
+                    button.css('opacity', '0.6');
+                    notify('success', 'Cảm ơn bạn đã bình chọn!');
+                }
+            }
+        ).fail(function() {
+            notify('error', 'Đã xảy ra lỗi. Vui lòng thử lại!');
+        });
+    });
+
+    // Rating picker: chọn sao 1-5 (mặc định 1 sao)
+    var $ratingForm = $('#addRatingForm');
+
+    function setRating(selectedValue) {
+        if (!selectedValue || selectedValue < 1) {
+            selectedValue = 1;
+        }
+
+        $('#RatingValue').val(selectedValue);
+        $('#ratingStars .star-btn').removeClass('selected');
+        $('#ratingStars .star-btn').each(function () {
+            var current = parseInt($(this).data('value'), 10);
+            if (current <= selectedValue) {
+                $(this).addClass('selected');
+            }
+        });
+    }
+
+    setRating(parseInt($('#RatingValue').val(), 10) || 1);
+
+    $('#ratingStars .star-btn').on('click', function () {
+        var selectedValue = parseInt($(this).data('value'), 10);
+        if (!selectedValue || selectedValue < 1) {
+            return;
+        }
+        setRating(selectedValue);
+    });
+
+    $('#ratingFormResetBtn').on('click', function () {
+        window.setTimeout(function () {
+            setRating(1);
+        }, 0);
+    });
+
+    function upsertHiddenField(fieldName, fieldValue) {
+        var $field = $ratingForm.find('input[type="hidden"][name="' + fieldName + '"]');
+        if ($field.length === 0) {
+            $field = $('<input type="hidden" />').attr('name', fieldName);
+            $ratingForm.append($field);
+        }
+        $field.val(fieldValue);
+    }
+
+    // Form validation
+    $ratingForm.on('submit', function () {
+        var userName = $.trim($ratingForm.find('input[name="rating.UserName"]').val() || '');
+        var email = $.trim($ratingForm.find('input[name="rating.Email"]').val() || '');
+        var phone = $.trim($ratingForm.find('input[name="rating.Phone"]').val() || '');
+        var visitDate = $.trim($ratingForm.find('input[name="rating.VisitDate"]').val() || '');
+        var rating = parseInt($ratingForm.find('#RatingValue').val(), 10);
+        var comment = $.trim($ratingForm.find('textarea[name="rating.Comment"]').val() || '');
+
+        if (!userName || !rating || rating < 1 || rating > 5 || !comment) {
+            notify('warning', 'Vui lòng điền đầy đủ các trường bắt buộc!');
+            return false;
+        }
+
+        // Gửi đồng thời field dạng thường để tương thích nhiều kiểu binding phía server.
+        upsertHiddenField('UserName', userName);
+        upsertHiddenField('Email', email);
+        upsertHiddenField('Phone', phone);
+        upsertHiddenField('VisitDate', visitDate);
+        upsertHiddenField('Rating', rating);
+        upsertHiddenField('Comment', comment);
+
+        var $submitButton = $ratingForm.find('button[type="submit"]');
+        $submitButton.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Dang gui...');
+        return true;
+    });
+});
+</script>
+
+<style>
+    /* Toast notification styles */
+    .toast-container {
+        z-index: 9999;
+    }
+</style>
+

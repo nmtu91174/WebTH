@@ -1,0 +1,201 @@
+﻿@model IEnumerable<WebTH.Models.VetClinic>
+
+@{
+    ViewBag.Title = "Quản Lý Phòng Khám";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-hospital"></i> Quản Lý Phòng Khám Thú Y</h1>
+            <a href="@Url.Action("CreateClinic", "AdminVet", new { Area = "Admin" })" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Thêm Phòng Khám
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center bg-light">
+                <div class="card-body">
+                    <h5>Tổng Phòng Khám</h5>
+                    <h3 class="text-primary">@ViewBag.TotalClinics</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center bg-light">
+                <div class="card-body">
+                    <h5>Đã Xác Minh</h5>
+                    <h3 class="text-success">@ViewBag.VerifiedCount</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center bg-light">
+                <div class="card-body">
+                    <h5>Chờ Xác Minh</h5>
+                    <h3 class="text-warning">@ViewBag.PendingCount</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clinic List -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Danh Sách Phòng Khám</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên Phòng Khám</th>
+                        <th>Địa Chỉ</th>
+                        <th>Điện Thoại</th>
+                        <th>Đánh Giá</th>
+                        <th>Khuyến Cáo</th>
+                        <th>Xác Minh</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var clinic in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@clinic.ClinicName</strong>
+                                @if (clinic.IsVerified)
+                                {
+                                    <span class="badge badge-success ml-2"><i class="fas fa-check-circle"></i></span>
+                                }
+                            </td>
+                            <td>
+                                <small>@clinic.District, @clinic.City</small><br/>
+                                <small class="text-muted">@clinic.Address</small>
+                            </td>
+                            <td>@clinic.Phone</td>
+                            <td>
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-star"></i> @clinic.AverageRating.ToString("F1")
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-info">@clinic.TotalRecommendations</span>
+                            </td>
+                            <td>
+                                @if (clinic.IsVerified)
+                                {
+                                    <span class="badge badge-success">Đã</span>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-warning verify-btn" data-clinic-id="@clinic.Id">
+                                        <i class="fas fa-check"></i> Xác Minh
+                                    </button>
+                                }
+                            </td>
+                            <td>
+                                <a href="@Url.Action("EditClinic", "AdminVet", new { Area = "Admin", id = clinic.Id })" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="@Url.Action("DoctorList", "AdminVet", new { Area = "Admin", id = clinic.Id })" 
+                                   class="btn btn-sm btn-info">
+                                    <i class="fas fa-user-md"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger delete-btn" data-clinic-id="@clinic.Id">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Count() == 0)
+        {
+            <div class="alert alert-info m-0">
+                <i class="fas fa-info-circle"></i> Chưa có phòng khám nào. 
+                <a href="@Url.Action("CreateClinic", "AdminVet", new { Area = "Admin" })">Thêm phòng khám mới</a>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin", page = ViewBag.CurrentPage - 1 })">
+                        Trước
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin", page = i })">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("ClinicList", "AdminVet", new { Area = "Admin", page = ViewBag.CurrentPage + 1 })">
+                        Tiếp
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Verify clinic
+            $('.verify-btn').click(function () {
+                var clinicId = $(this).data('clinic-id');
+                if (confirm('Bạn có chắc chắn muốn xác minh phòng khám này?')) {
+                    $.post('@Url.Action("VerifyClinic", "AdminVet", new { Area = "Admin" })', 
+                        { id: clinicId }, 
+                        function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                location.reload();
+                            }
+                        });
+                }
+            });
+
+            // Delete clinic
+            $('.delete-btn').click(function () {
+                var clinicId = $(this).data('clinic-id');
+                if (confirm('Bạn có chắc chắn muốn vô hiệu hóa phòng khám này?')) {
+                    $.post('@Url.Action("DeleteClinic", "AdminVet", new { Area = "Admin" })', 
+                        { id: clinicId }, 
+                        function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                location.reload();
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+    }
+</style>
