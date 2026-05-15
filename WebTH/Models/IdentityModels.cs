@@ -31,8 +31,10 @@ namespace WebTH.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
-
-
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
+        public DbSet<ShippingProvider> ShippingProviders { get; set; }
+        public DbSet<Shipment> Shipments { get; set; }
+        public DbSet<ShipmentHistory> ShipmentHistories { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
 
         public DbSet<ReviewProduct> Reviews { get; set; }

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<WebTH.Models.EF.Order>
+@{ ViewBag.Title = "Quản lý vận chuyển"; }
+
+@section naviheader {
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/shipment" class="nav-link">Quản lý vận chuyển</a>
+        </li>
+    </ul>
+}
+
+<section class="content">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Danh sách đơn hàng cần giao</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Địa chỉ</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái đơn</th>
+                        <th>Vận đơn</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        var shipment = o.Shipments?.FirstOrDefault();
+                        <tr>
+                            <td><strong>@o.Code</strong></td>
+                            <td>@o.CustomerName<br /><small>@o.Phone</small></td>
+                            <td>@o.Address</td>
+                            <td>@WebTH.Common.Common.FormatNumber(o.TotalAmount, 0)₫</td>
+                            <td>
+                                @{
+                                    var badge = o.Status == 1 ? "warning" :
+                                                o.Status == 2 ? "info" :
+                                                o.Status == 3 ? "primary" :
+                                                o.Status == 4 ? "success" : "secondary";
+                                    var label = o.Status == 1 ? "Chờ TT" :
+                                                o.Status == 2 ? "Đã TT" :
+                                                o.Status == 3 ? "Đang giao" :
+                                                o.Status == 4 ? "Hoàn thành" : "Hủy";
+                                }
+                                <span class="badge badge-@badge">@label</span>
+                            </td>
+                            <td>
+                                @if (shipment != null)
+                                {
+                                    <span class="badge badge-info">@shipment.TrackingCode</span><br />
+                                    <small>@shipment.Status?.Name</small>
+                                }
+                                else
+                                { <span class="text-muted">Chưa tạo</span>}
+                            </td>
+                            <td>
+                                @if (shipment != null)
+                                {
+                                    <a href="/admin/shipment/detail/@shipment.Id"
+                                       class="btn btn-sm btn-info">
+                                        <i class="fa fa-truck"></i> Theo dõi
+                                    </a>
+                                }
+                                else if (o.Status >= 2)
+                                {
+                                    <a href="/admin/shipment/create/@o.Id"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fa fa-plus"></i> Tạo vận đơn
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
