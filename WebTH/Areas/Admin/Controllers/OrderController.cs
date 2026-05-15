@@ -63,22 +63,55 @@ namespace WebTH.Areas.Admin.Controllers
         }
 
 
-        [HttpPost]
+        //[HttpPost]
 
+        //public ActionResult UpdateTT(int id, int trangthai)
+        //{
+        //    var item = db.Orders.Find(id);
+        //    if (item != null)
+        //    {
+        //        db.Orders.Attach(item);
+        //        item.Status = trangthai;
+        //        db.Entry(item).Property(x => x.Status).IsModified = true;
+
+        //        db.SaveChanges();
+        //        return Json(new { message = "Success", Success = true });
+        //    }
+        //    return Json(new { message = "Unsuccess", Success = false });
+
+        //}
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Employee")]
         public ActionResult UpdateTT(int id, int trangthai)
         {
-            var item = db.Orders.Find(id);
-            if (item != null)
+            var order = db.Orders.Find(id);
+            if (order != null && !order.IsLocked)
             {
-                db.Orders.Attach(item);
-                item.Status = trangthai;
-                db.Entry(item).Property(x => x.Status).IsModified = true;
+                order.PreviousStatus = order.Status;
+                order.Status = trangthai;
+
+                // Admin duyệt đơn
+                if (trangthai == 2)
+                {
+                    order.AgentId = User.Identity.GetUserId();
+                }
+
+                // Ghi Log lịch sử
+                db.OrderHistories.Add(new OrderHistory
+                {
+                    OrderId = order.Id,
+                    StatusId = trangthai,
+                    Role = "Admin",
+                    Note = trangthai == 2 ? "Admin đã duyệt đơn hàng" : "Admin cập nhật trạng thái",
+                    CreatedBy = User.Identity.GetUserId(),
+                    CreatedDate = DateTime.Now
+                });
 
                 db.SaveChanges();
-                return Json(new { message = "Success", Success = true });
+                return Json(new { Success = true, msg = "Cập nhật thành công!" });
             }
-            return Json(new { message = "Unsuccess", Success = false });
-
+            return Json(new { Success = false, msg = "Đơn hàng đã khóa hoặc không tồn tại!" });
         }
 
         [HttpPost]

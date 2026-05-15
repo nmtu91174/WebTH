@@ -3,6 +3,12 @@
 
 <style>
     /* Order History Styles */
+
+    .status-danger {
+        background: #ffebee;
+        color: #dc3545;
+    }
+
     .order-history-section {
         background: #fff;
         border-radius: 15px;
@@ -314,53 +320,77 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @*@foreach (var item in Model)
+        {
+            var statusClass = "status-completed";
+            var statusIcon = "fa-check-square";
+            var statusText = "Hoàn thành";
+
+            if (item.Status == 1)
+            {
+                statusClass = "status-pending";
+                statusIcon = "fa-clock-o";
+                statusText = "Chờ thanh toán";
+            }
+            else if (item.Status == 2)
+            {
+                statusClass = "status-paid";
+                statusIcon = "fa-check-circle";
+                statusText = "Đã thanh toán";
+            }
+            else if (item.Status == 3)
+            {
+                statusClass = "status-shipping";
+                statusIcon = "fa-truck";
+                statusText = "Đang giao hàng";
+            }*@
+
                     @foreach (var item in Model)
                     {
                         var statusClass = "status-completed";
                         var statusIcon = "fa-check-square";
-                        var statusText = "Hoàn thành";
+                        var statusText = "Chờ xử lý";
 
-                        if (item.Status == 1)
+                        switch (item.Status)
                         {
-                            statusClass = "status-pending";
-                            statusIcon = "fa-clock-o";
-                            statusText = "Chờ thanh toán";
-                        }
-                        else if (item.Status == 2)
-                        {
-                            statusClass = "status-paid";
-                            statusIcon = "fa-check-circle";
-                            statusText = "Đã thanh toán";
-                        }
-                        else if (item.Status == 3)
-                        {
-                            statusClass = "status-shipping";
-                            statusIcon = "fa-truck";
-                            statusText = "Đang giao hàng";
+                            case 1:
+                                statusClass = "status-pending"; statusIcon = "fa-clock-o"; statusText = "Đã đặt hàng (Chờ duyệt)"; break;
+                            case 2:
+                                statusClass = "status-paid"; statusIcon = "fa-check-circle"; statusText = "Đã duyệt (Chờ phân công)"; break;
+                            case 3:
+                                statusClass = "status-shipping"; statusIcon = "fa-motorcycle"; statusText = "Shipper đã nhận đơn"; break;
+                            case 4:
+                                statusClass = "status-shipping"; statusIcon = "fa-box"; statusText = "Shipper đang đi giao"; break;
+                            case 5:
+                                statusClass = "status-completed"; statusIcon = "fa-check"; statusText = "Giao thành công"; break;
+                            case 6:
+                                statusClass = "status-danger"; statusIcon = "fa-times"; statusText = "Giao thất bại"; break;
+                            case 7:
+                                statusClass = "status-danger"; statusIcon = "fa-ban"; statusText = "Đã hủy"; break;
                         }
 
-                        <tr>
-                            <td class="order-stt">#@i</td>
-                            <td class="order-code">@item.Code</td>
-                            <td class="order-date">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td class="order-total">@Common.FormatNumber(item.TotalAmount, 0)đ</td>
-                            <td>
-                                <span class="status-badge @statusClass">
-                                    <i class="fa @statusIcon"></i>
-                                    <span>@statusText</span>
-                                </span>
-                            </td>
-                            <td>
-                                <button type="button"
-                                        class="btn btn-order-detail js-order-detail"
-                                        data-order-id="@item.Id"
-                                        data-order-code="@item.Code">
-                                    <i class="fa fa-eye"></i> Xem chi tiết
-                                </button>
-                            </td>
-                        </tr>
+                     <tr>
+                        <td class="order-stt">#@i</td>
+                        <td class="order-code">@item.Code</td>
+                        <td class="order-date">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="order-total">@Common.FormatNumber(item.TotalAmount, 0)đ</td>
+                        <td>
+                            <span class="status-badge @statusClass">
+                                <i class="fa @statusIcon"></i>
+                                <span>@statusText</span>
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-order-detail js-order-detail"
+                                    data-order-id="@item.Id"
+                                    data-order-code="@item.Code">
+                                <i class="fa fa-eye"></i> Xem chi tiết
+                            </button>
+                        </td>
+                    </tr>
 
-                        i++;
+                    i++;
                     }
                 </tbody>
             </table>

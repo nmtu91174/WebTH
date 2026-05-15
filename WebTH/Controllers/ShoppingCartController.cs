@@ -217,8 +217,24 @@ namespace WebTH.Controllers
                     if (User.Identity.IsAuthenticated)
                         order.CustomerId = User.Identity.GetUserId();
                     order.Code = GenerateUniqueOrderCode();
+
+                    // Đảm bảo đơn hàng được gán Status = 1 (Booked)
+                    order.Status = 1;
+                    order.IsLocked = false;
+
+                    // Khởi tạo và ghi log History
+                    order.OrderHistories = new List<OrderHistory>();
+                    order.OrderHistories.Add(new OrderHistory
+                    {
+                        StatusId = 1,
+                        Role = "Customer",
+                        Note = "Khách hàng đặt đơn thành công",
+                        CreatedBy = order.CustomerId,
+                        CreatedDate = DateTime.Now
+                    });
+
                     db.Orders.Add(order);
-                    db.SaveChanges();
+                    db.SaveChanges(); // Lưu vào DB
 
                     // Cập nhật tồn kho sản phẩm
                     foreach (var sanpham in cart.Items)

@@ -75,9 +75,14 @@ namespace WebTH.Controllers
                 return new HttpUnauthorizedResult();
             }
 
+            //var order = _db.Orders
+            //    .Include(x => x.OrderDetails.Select(d => d.Product))
+            //    .FirstOrDefault(x => x.Id == id && x.CustomerId == user.Id);
+
             var order = _db.Orders
-                .Include(x => x.OrderDetails.Select(d => d.Product))
-                .FirstOrDefault(x => x.Id == id && x.CustomerId == user.Id);
+    .Include(x => x.OrderDetails.Select(d => d.Product))
+    .Include(x => x.OrderHistories) // 👈 BẮT BUỘC THÊM DÒNG NÀY ĐỂ LẤY LỊCH SỬ
+    .FirstOrDefault(x => x.Id == id && x.CustomerId == user.Id);
 
             if (order == null)
             {
