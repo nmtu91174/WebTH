@@ -35,26 +35,52 @@ namespace WebTH.Areas.Admin.Controllers
             return View(items.ToPagedList(pageNumber, pageSize));
         }
 
+        //public ActionResult View(int id)
+        //{
+        //    var item = db.Orders.Find(id);
+        //    if (item == null) return HttpNotFound();
+
+        //    // LẤY DANH SÁCH SHIPPER TRUYỀN RA VIEW
+        //    var roleManager = new Microsoft.AspNet.Identity.RoleManager<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>(new Microsoft.AspNet.Identity.EntityFramework.RoleStore<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>(db));
+        //    var userManager = new Microsoft.AspNet.Identity.UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(db));
+
+        //    // Tìm Role Shipper
+        //    var shipperRole = roleManager.FindByName("Shipper");
+        //    if (shipperRole != null)
+        //    {
+        //        var shippers = userManager.Users.Where(x => x.Roles.Any(r => r.RoleId == shipperRole.Id)).ToList();
+        //        ViewBag.ShipperList = new SelectList(shippers, "Id", "FullName"); // Hiển thị tên Shipper
+        //    }
+
+        //    return View(item);
+        //}
+
         public ActionResult View(int id)
         {
             var item = db.Orders.Find(id);
             if (item == null) return HttpNotFound();
 
-            // LẤY DANH SÁCH SHIPPER TRUYỀN RA VIEW
             var roleManager = new Microsoft.AspNet.Identity.RoleManager<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>(new Microsoft.AspNet.Identity.EntityFramework.RoleStore<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>(db));
             var userManager = new Microsoft.AspNet.Identity.UserManager<ApplicationUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<ApplicationUser>(db));
 
-            // Tìm Role Shipper
+            // 1. LẤY DANH SÁCH SHIPPER CHO DROPDOWN (Nếu đơn hàng đang ở trạng thái 2)
             var shipperRole = roleManager.FindByName("Shipper");
             if (shipperRole != null)
             {
                 var shippers = userManager.Users.Where(x => x.Roles.Any(r => r.RoleId == shipperRole.Id)).ToList();
-                ViewBag.ShipperList = new SelectList(shippers, "Id", "FullName"); // Hiển thị tên Shipper
+                // Lấy Fullname, nếu Fullname trống thì lấy UserName (Email)
+                ViewBag.ShipperList = new SelectList(shippers.Select(s => new { Id = s.Id, Name = !string.IsNullOrEmpty(s.Fullname) ? s.Fullname : s.UserName }), "Id", "Name");
+            }
+
+            // 2. LẤY TÊN SHIPPER NẾU ĐƠN ĐÃ ĐƯỢC GÁN
+            if (!string.IsNullOrEmpty(item.ShipperId))
+            {
+                var shipperUser = userManager.FindById(item.ShipperId);
+                ViewBag.ShipperName = shipperUser != null ? (!string.IsNullOrEmpty(shipperUser.Fullname) ? shipperUser.Fullname : shipperUser.UserName) : "Không xác định";
             }
 
             return View(item);
         }
-
         public ActionResult Partial_SanPham(int id)
         {
             var items = db.OrderDetails.Where(x => x.OrderId == id).ToList();
