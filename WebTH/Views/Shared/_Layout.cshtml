@@ -273,7 +273,23 @@
                                         <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i>@User.Identity.Name</a></li>
                                         <li><a href="/account/profile"><i class="fa fa-sign-in" aria-hidden="true"></i>Hồ sơ</a></li>
                                         <li><a href="/wishlist/index"><i class="fa fa-sign-in" aria-hidden="true"></i>Sản phẩm yêu thích</a></li>
-                                       
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Employee"))
+                                        {
+                                            <li>
+                                                <a href="/Admin/Home/Index" style="color: #ff9800; font-weight: bold;">
+                                                    <i class="fa fa-tachometer" aria-hidden="true"></i>Admin Dashboard
+                                                </a>
+                                            </li>
+                                        }
+                                        else if (User.IsInRole("Shipper"))
+                                        {
+                                            <li>
+                                                <a href="/Admin/Shipper/Index" style="color: #4caf50; font-weight: bold;">
+                                                    <i class="fa fa-motorcycle" aria-hidden="true"></i>Shipper Homepage
+                                                </a>
+                                            </li>
+                                        }
+
                                         <li><a href="javascript:document.getElementById('logOffForm').submit()"><i class="fa fa-user-plus" aria-hidden="true"></i>Đăng xuất</a></li>
                                     </ul>
                                 </li>
