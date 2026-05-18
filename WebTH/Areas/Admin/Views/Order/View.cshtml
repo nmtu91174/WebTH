@@ -77,6 +77,14 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Trạng thái đơn hàng</label>
+
+                        @if (Model.DeliveryAttempts > 0)
+                        {
+                            <div class="text-danger mb-1" style="font-size: 13px; font-weight: bold;">
+                                <i class="fa fa-warning"></i> Đã giao thất bại: @Model.DeliveryAttempts / 3 lần
+                            </div>
+                        }
+
                         <div class="form-control" style="border: none; padding-left: 0;">
                             @switch (Model.Status)
                             {
@@ -138,13 +146,30 @@
                         </div>
                     </div>
                 }
+
+                @if (Model.Status == 6 && Model.DeliveryAttempts < 3)
+                {
+                    <div class="col-12">
+                        <div class="card card-danger mt-3" style="border: 2px dashed #dc3545;">
+                            <div class="card-body text-center">
+                                <h4 class="text-danger"><i class="fa fa-refresh"></i> Đơn hàng đang bị khóa do giao thất bại!</h4>
+                                <p>Số lần thất bại: <strong>@Model.DeliveryAttempts/3</strong>. Bạn có muốn mở khóa để phân công lại cho Shipper khác đi giao không?</p>
+                                <button class="btn btn-danger btn-lg mt-2" onclick="retryDelivery(@Model.Id)">
+                                    <i class="fa fa-unlock"></i> Mở khóa & Cho phép giao lại
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
             </div>
         </div>
     </div>
 </section>
 @section scripts{
     <script>
-        function assignShipper(orderId) {
+        function assignShipper(orderId)
+        {
             var shipperId = $('#ddlShipper').val();
             if (!shipperId) {
                 alert('Vui lòng chọn 1 Shipper!'); return;
@@ -163,5 +188,22 @@
                 }
             });
         }
+
+        function retryDelivery(orderId)
+        {
+            if (confirm("Bạn có chắc chắn muốn mở khóa và yêu cầu giao lại đơn hàng này?")) {
+                $.post('/Admin/Order/RetryDelivery', { id: orderId }, function (res) {
+                    if (res.success) {
+                        alert(res.msg);
+                        location.reload();
+                    } else {
+                        alert(res.msg);
+                    }
+                });
+            }
+        }
+
+
     </script>
+
 }

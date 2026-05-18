@@ -169,6 +169,8 @@ namespace WebTH.Areas.Admin.Controllers
                 PageOrientation = Rotativa.Options.Orientation.Portrait
             };
         }
+
+
         [HttpPost]
         [Authorize(Roles = "Admin,Employee")]
         public ActionResult AssignShipper(int id, string shipperId)
@@ -195,7 +197,38 @@ namespace WebTH.Areas.Admin.Controllers
             return Json(new { success = false, msg = "Đơn hàng phải ở trạng thái ĐÃ DUYỆT mới được phân công!" });
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin,Employee")]
+        public ActionResult RetryDelivery(int id)
+        {
+            var order = db.Orders.Find(id);
+            // Chỉ cho phép giao lại nếu: Trạng thái đang là Thất bại (6) VÀ số lần < 3
+            if (order != null && order.Status == 6 && order.DeliveryAttempts < 3)
+            {
+                order.PreviousStatus = 6;
+                order.Status = 2; // Đưa về trạng thái 2 (Chờ phân công)
+                order.IsLocked = false; // MỞ KHÓA ĐƠN HÀNG
+                order.ShipperId = null; // Xóa Shipper cũ đi để Admin gán lại từ đầu
+
+                // Ghi Log lịch sử
+                db.OrderHistories.Add(new OrderHistory
+                {
+                    OrderId = order.Id,
+                    StatusId = 2,
+                    Role = "Admin",
+                    Note = $"Admin yêu cầu GIAO LẠI (Đã thất bại {order.DeliveryAttempts}/3 lần)",
+                    CreatedBy = User.Identity.GetUserId(),
+                    CreatedDate = DateTime.Now
+                });
+
+                db.SaveChanges();
+                return Json(new { success = true, msg = "Mở khóa đơn hàng thành công! Vui lòng phân công lại Shipper." });
+            }
+            return Json(new { success = false, msg = "Không thể giao lại đơn hàng này (Quá 3 lần hoặc sai trạng thái)!" });
+        }
+
     }
+
 
 
 }

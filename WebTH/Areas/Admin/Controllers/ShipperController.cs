@@ -88,8 +88,24 @@ namespace WebTH.Areas.Admin.Controllers
                     order.DeliveryProof = imagePath; // Lưu ảnh chứng minh thất bại
                     order.FailedReason = failedReason;
                     order.FailedAt = DateTime.Now;
+
+                    // 👇 Tăng số lần thất bại lên 1
+                    order.DeliveryAttempts += 1;
+
+                    // 👇 Nếu đã thất bại 3 lần -> Tự động Vô hiệu hóa (Hủy)
+                    if (order.DeliveryAttempts >= 3)
+                    {
+                        nextStatus = 7; // Ghi đè trạng thái sang Đã Hủy
+                        order.Status = 7;
+                        actionNote = "Hệ thống tự động HỦY ĐƠN do giao thất bại 3 lần. Lý do cuối: " + note;
+                    }
+                    else
+                    {
+                        actionNote = $"Giao thất bại lần {order.DeliveryAttempts}/3: " + note;
+                    }
+
                     order.IsLocked = true; // KHÓA ĐƠN
-                    actionNote = "Giao thất bại: " + note;
+                    //actionNote = "Giao thất bại: " + note;
                     break;
             }
 

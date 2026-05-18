@@ -236,9 +236,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202605150742477_InitialSync.cs" />
-    <Compile Include="Migrations\202605150742477_InitialSync.Designer.cs">
-      <DependentUpon>202605150742477_InitialSync.cs</DependentUpon>
+    <Compile Include="Migrations\202605181101230_Fix_Order_DuplicateColumn.cs" />
+    <Compile Include="Migrations\202605181101230_Fix_Order_DuplicateColumn.Designer.cs">
+      <DependentUpon>202605181101230_Fix_Order_DuplicateColumn.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -4177,8 +4177,8 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202605150742477_InitialSync.resx">
-      <DependentUpon>202605150742477_InitialSync.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202605181101230_Fix_Order_DuplicateColumn.resx">
+      <DependentUpon>202605181101230_Fix_Order_DuplicateColumn.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

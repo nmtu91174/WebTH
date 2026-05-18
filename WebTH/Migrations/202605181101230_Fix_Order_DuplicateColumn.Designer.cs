@@ -7,13 +7,13 @@ namespace WebTH.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class InitialSync : IMigrationMetadata
+    public sealed partial class Fix_Order_DuplicateColumn : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialSync));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Fix_Order_DuplicateColumn));
         
         string IMigrationMetadata.Id
         {
-            get { return "202605150742477_InitialSync"; }
+            get { return "202605181101230_Fix_Order_DuplicateColumn"; }
         }
         
         string IMigrationMetadata.Source

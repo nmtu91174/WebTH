@@ -60,6 +60,8 @@ namespace WebTH.Models.EF
         public DateTime? DeliveredAt { get; set; }
         public DateTime? FailedAt { get; set; }
 
+        // 👇 THÊM DÒNG NÀY ĐỂ ĐẾM SỐ LẦN THẤT BẠI
+        public int DeliveryAttempts { get; set; }
         public virtual ICollection<OrderHistory> OrderHistories { get; set; }
     }
 }
