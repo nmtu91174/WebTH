@@ -70,23 +70,35 @@
                                     }
                                 </td>
                                 <td>
-                                    @if(item.Status == 1)
-                    {
-                        <span>Chưa thanh toán</span>
-                    }
-                                    @if(item.Status == 2)
-                    {
-                        <span>Đã thanh toán</span>
-                    } 
-                                    @if(item.Status == 3)
-                    {
-                        <span>Đang giao hàng</span>
-                    }
-                                    @if(item.Status == 4)
-                    {
-                        <span>Hoàn thành</span>
-                    }
- 
+                                    @if (item.Status == 1)
+                                    {
+                                        <span>Đã tạo đơn</span>
+                                    }
+                                    @if (item.Status == 2)
+                                    {
+                                        <span>Admin đã duyệt</span>
+                                    }
+                                    @if (item.Status == 3)
+                                    {
+                                        <span>Shipper nhận đơn</span>
+                                    }
+                                    @if (item.Status == 4)
+                                    {
+                                        <span>Đã lấy hàng</span>
+                                    }
+                                    @if (item.Status == 5)
+                                    {
+                                        <span>Giao thành công</span>
+                                    }
+                                    @if (item.Status == 6)
+                                    {
+                                        <span>Giao thất bại</span>
+                                    }
+                                    @if (item.Status == 6)
+                                    {
+                                        <span>Hủy đơn</span>
+                                    }
+
                                 </td>
                                 
                                 <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
@@ -148,10 +160,13 @@
                 <div class="form-group">
                     <label>Trạng thái</label>
                     <select class="form-control" id="ddTrangThai">
-                        <option value="1">Chờ Thanh Toán</option>
-                        <option value="2">Đã thanh toán</option>
-                        <option value="3">Đang Giao Hàng</option>
-                        <option value="4">Hoàn thành đơn</option>
+                        <option value="1">Đơn mới</option>
+                        <option value="2">Admin duyệt</option>
+                        <option value="3">Shipper nhận đơn</option>
+                        <option value="4">Đã lấy hàng</option>
+                        <option value="5">Giao thành công</option>
+                        <option value="6">Giao thất bại</option>
+                        <option value="7">Hủy đơn</option>
                     </select>
                 </div>
             </div>
